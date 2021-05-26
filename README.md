@@ -36,14 +36,8 @@ LongitudinalMRI is divided in three processing streamlines, each for a different
 Each processing streamline is further divided into sub-streams:
 
 * [Structural streamline](structural.md)
-*  **Diffusion**, for diffusuib data.
-  * Pre model fitting (preMF)
-  * Model fitting (MF)
-  * Post model fitting (postMF)
-*   **Functional**, for functional data.
-  * ...
-  * ...
-  * ...
+* [Diffusion stramline](diffusion.md)
+* [Functional stramline](functional.md)
 
 Additional Featuers
 ===================

@@ -39,10 +39,12 @@ The **structural** stream is divided into:
 * Pre FreeSurfer (preFS)
 * FreeSurfer (FS)
 * Post FreeSurfer (postFS)
+
 The **diffusion** stream is divided into:
 * Pre model fitting (preMF)
 * Model fitting (MF)
 * Post model fitting (postMF)
+
 The **functional** stream is divided into:
 * ...
 * ...

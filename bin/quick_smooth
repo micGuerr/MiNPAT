@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ in=$1
+ out=$2
+ $FSLDIR/bin/fslmaths $in -subsamp2 -subsamp2 -subsamp2 -subsamp2 vol16
+ $FSLDIR/bin/flirt -in vol16 -ref $in -out $out -noresampblur -applyxfm -paddingsize 16
+ # possibly do a tiny extra smooth to $out here?
+ $FSLDIR/bin/imrm vol16
+

@@ -1,0 +1,324 @@
+#!/bin/bash
+
+# Requirements for this script
+#  installed versions of: FSL (including python with numpy, needed to run aff2rigid - part of FSL)
+#  installed version of DTITK
+#  installed version of ANTs or separately downloaded N4BiasFieldCorrection if N4-based correction to be used
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}: Attempts to correct for bias field inhomogeneities.
+
+Usage: ${script_name}
+  --in=<invol>
+  [--t2w=<inT2w>]
+  [--out=<ouput>]
+  [--n4]
+  [--noCleanUp]
+
+========================
+
+<invol>: 	Is the input volume. A T1w image is expected.
+
+<inT2w>: 	Optional T2w image.
+
+--noReorient: 	Don't run reorientation.
+		Reorientation matchs the orientaion of the standard template. It makes the 
+		images appear "the same way around" in FSLview.
+		Check https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Orientation%20Explained
+		for more info.
+
+--out:		Specify the folder and ouput basename. If not specified the output
+		will be saved in the current directory. The unbiased volume will 
+		be named  <invol>_unbias.
+
+--noBet		The input image has already brain extracted or you want to perform the bias correction 
+		with the brain.
+
+--n4:		Use N4BiasFieldCorrection approach (it does not need the T2w image).
+
+--noCleanUp:	Keep all temporary files. Recommended for debagging only
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+#  Verify required environment variables are set and log value
+# ------------------------------------------------------------------------------
+
+if [ -z $FSLDIR ] ; then
+  echo "${script_name}: ABORTING: FSLDIR environment variable must be set"
+  exit 1
+fi
+
+if [ -z "${DTITK_ROOT}" ]
+then
+        echo "${script_name}: ABORTING: DTITK_ROOT environment variable must be set"
+        exit 1
+fi
+
+# source dtitk_common.sh
+. ${DTITK_ROOT}/scripts/dtitk_common.sh
+
+################################## SUPPORT FUNCTIONS ###################################################
+
+# funtion for parsing options
+getopt1() {
+	sopt="$1"
+	shift 1
+	for fn in $@; do
+		if [ `echo $fn | grep -- "^${sopt}=" | wc -w` -gt 0 ] ; then
+			echo $fn | sed "s/^${sopt}=//"
+			return 0
+		fi
+	done
+}
+
+# funtion for parsing options
+getopt2() {
+        sopt="$1"
+        shift 1
+        for fn in $@; do
+                if [ `echo $fn | grep -- "^${sopt}" | wc -w` -gt 0 ] ; then
+			echo 1
+                        return 0
+                fi
+        done
+	echo 0
+}
+
+
+# perform smoothing
+quick_smooth() {
+	# This is similar to fslmaths -s 20 but slightly faster
+	in=$1
+	out=$2
+	fslmaths $in -subsamp2 -subsamp2 -subsamp2 -subsamp2 vol16
+	flirt -in vol16 -ref $in -out $out -noresampblur -applyxfm -paddingsize 16
+	imrm vol16
+}
+
+# perform a rough bias field estimation and approximate brain extraction
+gross_biascorr() {
+
+	input=$1
+
+	filename=`basename "${input}"`
+	prefix=`getTVPrefix $filename`	
+	
+	# outputs
+	InVol_smth="${OutTmpDir}/${InPrefx}_s20" # smoothed image
+	InVol_hpf="${OutTmpDir}/${InPrefx}_hpf" # high-pass filtered image
+	InVol_hpf_brain="${OutTmpDir}/${InPrefx}_hpf_brain" # hpf brain
+	InVol_hpf_brain_msk="${OutTmpDir}/${InPrefx}_hpf_brain_mask" # hpf brain mask
+	InVol_hpf_brain_smth="${OutTmpDir}/${InPrefx}_hpf_brain_s20" # hpf brain smoothed
+	InVol_hpf_brain_msk_smth="${OutTmpDir}/${InPrefx}_hpf_brain_mask_s20" # hpf brain mask smoothed
+	roughBiasfield="${OutTmpDir}/${InPrefx}_biasfield_rough" # bias corrected (step1)
+	roughBiascorr="${OutTmpDir}/${InPrefx}_restore_rough_brain" # bias corrected brain (step1)
+
+	# run smoothing
+	echo "Quick smooth..." | tee -a $logFile
+	quick_smooth ${VolIn} ${InVol_smth}
+	# approximate correction by ratio
+	fslmaths ${VolIn} -div ${InVol_smth} ${InVol_hpf}
+	if [ $NoBet -eq 0 ] ; then
+		echo "Running BET..." | tee -a $logFile
+		# perform a gross brain ecxtraction.
+		bet ${InVol_hpf} ${InVol_hpf_brain} -m -f 0.3
+	else
+		fslmath ${InVol_hpf} ${InVol_hpf_brain} # use this instead of copy as you don't need to specify extension
+	fi
+	echo "Quick smoothing again..." | tee -a $logFile
+	fslmaths ${VolIn} -mas ${InVol_hpf_brain} ${InVol_hpf_brain_smth}
+	quick_smooth ${InVol_hpf_brain_smth} ${InVol_hpf_brain_smth}
+	quick_smooth ${InVol_hpf_brain_msk} ${InVol_hpf_brain_msk_smth}
+	fslmaths ${InVol_hpf_brain_smth} -div ${InVol_hpf_brain_msk_smth} -mas ${InVol_hpf_brain} -dilall ${roughBiasfield}
+	fslmaths ${VolIn} -div ${roughBiasfield} ${roughBiascorr}
+	if [ $NoBet -eq 0 ] ; then
+		echo "Running BET once more..." | tee -a $logFile
+		# perform a gross brain ecxtraction.
+		bet ${roughBiascorr} ${InVol_hpf_brain} -m -f 0.2
+		fslmaths ${roughBiascorr} -mas ${InVol_hpf_brain} ${roughBiascorr}
+	fi
+	# make sure the overall scaling doesn't change (equate medians)
+	med0=`fslstats ${VolIn} -k ${roughBiascorr} -P 50`;
+	med1=`fslstats ${roughBiascorr} -k ${InVol_hpf_brain} -P 50`;
+	fslmaths ${roughBiascorr} -div $med1 -mul $med0 ${roughBiascorr}
+}
+
+
+defaultopt() {
+    echo $1
+}
+
+################################################### OUTPUT FILES #####################################################
+
+# All except $OutVol variables, are saved in a directory created ad-hoc, named tmpUnbias.
+# $OutMat and tmpUnbias are created in the current directory or that specified by --out flag:
+
+##	Bias correction via Fast:
+#	$biasEstimation is the final bias field estimation
+#	$InVol_hpf_brain is a temporary brain extraction. Useful to check to make sure everything went good
+#	(If the brain extraction went catstrofically bed, there are chances the algorithm failed).
+#	"OutVol"  (the ACPC aligned image)
+
+
+################################### OPTIONS PARSING ###################################################
+
+VolIn=`getopt1 "--in" $@`  # "$1"
+T2wVolIn=`getopt1 "--inT2w" $@`  # "$2"
+Out=`getopt1 "--out" $@`  # "$3"
+NoBet=`getopt2 "--noBet" $@`  # "$4"
+DoN4=`getopt2 "--n4" $@`  # "$5"
+DontClean=`getopt2 "--noCleanUp" $@`  # "$6"
+
+# Default parameters
+
+# input root
+InFileName=`basename "${VolIn}"`
+InPrefx=`getTVPrefix $InFileName`
+
+# The outputs
+if [ -z $Out ] ; then
+        OutDir=$PWD;
+        OutVol="${OutDir}/${InPrefx}_ubias.nii.gz"
+        OutMat="${OutDir}/${InPrefx}_unbias.mat"
+        OutTmpDir="${OutDir}/tmpUnbias"
+else
+        OutDir=`dirname "$Out"`
+        OutVol=$Out
+        OutTmpDir="${OutDir}/tmpUnbias"
+fi
+
+# Define the log file
+logFile="${OutTmpDir}/log.txt"
+
+################################## DO WORK ###########################################################
+
+# Creat the folder to store intermediate results
+if [ ! -d $OutTmpDir ] ; then
+	mkdir $OutTmpDir
+fi
+
+# Create the log file
+> $logFile
+echo "Running Bias field correction" | tee -a $logFile
+echo "Input: ${VolIn}" | tee -a $logFile
+echo "Output directory: ${OutDir}" | tee -a $logFile
+echo " " | tee -a $logFile
+
+if [ ! $DoN4 -eq 0 ] ; then
+
+	#### Bias field correction using N4 method ####
+	echo "N4 method selected: " | tee -a $logFile
+
+	echo "N4BiasFieldCorrection -d 3 -i $VolIn -o $OutVol"
+elif [ ! -z $T2wVolIn ] ; then
+
+	#### Bias field correction using T2w image ####
+	echo "Correction via T2w image: " | tee -a $logFile
+	
+	## First step: Brain extraction via gross bias correction for T1w and T2w
+	echo "Part One - gross bias correction." | tee -a $logFile
+	echo "---------------------------------" | tee -a $logFile
+	gross_biascorr
+
+	echo "pippo"
+else
+
+	#### Bias field correction using fsl_anat approach ####
+	echo "FAST based correction method: " | tee -a $logFile
+	echo " " | tee -a $logFile
+	
+	# inputs
+	type=1 # correspond to T1w image
+	niter=5
+	smooth=10
+	
+	## First step: very gross bias fild correction
+	echo "Part One - gross bias correction." | tee -a $logFile
+	echo "---------------------------------" | tee -a $logFile
+	gross_biascorr
+
+	## Second step: more accurate bias correction via FLIRT
+	echo "Part Two - more accurate correction via FAST." | tee -a $logFile
+	echo "---------------------------------" | tee -a $logFile
+	# outputs
+	initfast="${OutTmpDir}/${InPrefx}_initfast"
+	initfast_out="${OutTmpDir}/${InPrefx}_initfast_restore"
+	initfast2="${OutTmpDir}/${InPrefx}_initfast2"
+	initfast_out2="${OutTmpDir}/${InPrefx}_initfast2_restore"
+
+	# run fast
+	echo "***FAST 1-st instance ****" | tee -a $logFile
+	fast -o ${initfast} -l ${smooth} -b -B -t $type --iter=${niter} --nopve --fixed=0 -v ${roughBiascorr} >> $logFile
+	echo "***FAST 2-nd instance ****" | tee -a $logFile
+	fast -o ${initfast2} -l ${smooth} -b -B -t $type --iter=${niter} --nopve --fixed=0 -v ${initfast_out} >> $logFile
+	
+	## Second step: more accurate bias correction via FLIRT
+	echo "Part Three - final correction." | tee -a $logFile
+	echo "---------------------------------" | tee -a $logFile
+	# outputs
+	fast="${OutTmpDir}/${InPrefx}_fast"
+	fast_out="${OutTmpDir}/${InPrefx}_fast_restore"
+	fast_total_bias="${OutTmpDir}/${InPrefx}_fast_totbias"
+	InVol_hpf_brain_msk_ero="${OutTmpDir}/${InPrefx}_hpf_brain_mask_ero4"
+	biasEstimation="${OutTmpDir}/${InPrefx}_biasfield_final"
+
+	# run fast a third time
+	echo "***FAST 3-rd instance ****" | tee -a $logFile
+	fast -o ${fast} -l ${smooth} -b -B -t $type --iter=${niter} --nopve --fixed=0 -v ${initfast_out2} >> $logFile
+	# "Extrapolating bias field from central region"
+	fslmaths ${VolIn} -div ${fast_out} -mas ${InVol_hpf_brain} ${fast_total_bias}
+	fslmaths ${InVol_hpf_brain} -bin -ero -ero -ero -ero  ${InVol_hpf_brain_msk_ero}
+    	fslmaths ${fast_total_bias} -sub 1 ${fast_total_bias} 
+	fslsmoothfill -i ${fast_total_bias} -m ${InVol_hpf_brain_msk_ero} -o ${biasEstimation}
+	fslmaths ${biasEstimation} -add 1 ${biasEstimation} 
+    	fslmaths ${fast_total_bias} -add 1 ${fast_total_bias} 
+    	#fslmaths $totbias -sub 1 -mas $mask_ero -dilall -add 1 (shouldn't be 2 ?!) $biasEstimation  # alternative to fslsmoothfill
+    	fslmaths ${VolIn} -div ${biasEstimation} ${OutVol}
+
+	if [ $DontClean -eq 0 ] ; then
+		echo "Remove some temporary files" | tee -a $logFile
+		imrm ${InVol_smth}		
+		imrm ${InVol_hpf}		
+		imrm ${OutTmpDir}/${InPrefx}_hpf_brain_*
+		imrm ${roughBiasfield}
+		imrm ${roughBiascorr}
+		imrm ${OutTmpDir}/${InPrefx}_initfast*
+		imrm ${OutTmpDir}/${InPrefx}_fast*
+		imrm ${OutTmpDir}/${InPrefx}_biasfield_final_*
+	fi
+
+	echo "Bias correction done!"
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

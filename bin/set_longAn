@@ -1,0 +1,155 @@
+#!/bin/bash
+
+# Requirements for this script
+# No requirments are needed
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}: Tool for initializing the folder structure.
+
+Usage: ${script_name}
+  --wrkdir=<working_dir>
+  --subjid=<subjID_list>
+  [--sessid=<sessID_list>]
+  [--anat]
+  [--dwi]
+  [--func]
+
+========================
+
+<subj-ID> and <sess-ID> are text file names in which each line correspond
+to a subject and a session respectively.
+The sessions will be the same for each subject.
+
+The optional flags "--anat", "--dwi", "--func" specify the folder
+structure should be initialized for that (those) specific streamline(s).
+If not specified all the streamlines are initialized.
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+################################## SUPPORT FUNCTIONS ###################################################
+
+# funtion for parsing options
+getopt1() {
+	sopt="$1"
+	shift 1
+	for fn in $@; do
+		if [ `echo $fn | grep -- "^${sopt}=" | wc -w` -gt 0 ] ; then
+			echo $fn | sed "s/^${sopt}=//"
+			return 0
+		fi
+	done
+}
+
+# funtion for parsing options
+getopt2() {
+        sopt="$1"
+        shift 1
+        for fn in $@; do
+                if [ `echo $fn | grep -- "^${sopt}" | wc -w` -gt 0 ] ; then
+			echo 1
+                        return 0
+                fi
+        done
+	echo 0
+}
+
+defaultopt() {
+    echo $1
+}
+
+mkdirFromFile() {
+
+	path="$1"
+	SubjFile="$2"
+	SessFile="$3"
+
+	while IFS1= read -r line1 ; do
+		SubjDir="$path/$line1"
+		if [ ! -d $SubjDir ] ; then
+			mkdir $SubjDir
+		fi
+
+		if [ ! -z $SessFile ] ; then
+			while IFS2= read -r line2 ; do
+				SessDir="$path/$line1/$line2"
+			        if [ ! -d $SessDir ] ; then
+                        		mkdir $SessDir
+	               		fi
+			done  < "$SessFile"
+		fi
+	done < "$SubjFile"
+
+}
+
+
+################################## OPTIONS PARSING ###################################################
+
+WD=`getopt1 "--wrkdir" $@`  # "$1"
+SubjID=`getopt1 "--subjid" $@`  # "$2"
+SessID=`getopt1 "--sessid" $@`  # "$3"
+DoStruct=`getopt2 "--anat" $@`  # "$4"
+DoDiff=`getopt2 "--dwi" $@`  # "$5"
+DoFunc=`getopt2 "--func" $@`  # "$6"
+
+
+if [ "$DoStruct" -eq 0 ] &&  [ "$DoDiff" -eq 0 ] &&  [ "$DoFunc" -eq 0 ] ; then
+	DoStruct=1
+	DoDiff=1
+	DoFunc=1
+fi
+
+######################################## DO WORK ###############################################
+
+# Check if the working directory exists, if not create it
+if [ ! -d  $WD ] ; then
+	mkdir $WD
+fi
+
+# Define the three streamlines
+StreamL=(anat dwi func)
+DoStream=($DoStruct $DoDiff $DoFunc)
+SubSNames=(FS MF UKN)
+
+# loop over the streamlines, creat the structure if required
+for i in 0 1 2; do
+
+	# Check whther the stream is required
+	if [ ${DoStream[$i]} -gt 0 ] ; then
+
+		# if so, create the main folder
+		StreamFold=$WD/${StreamL[$i]}
+		if [ ! -d $StreamFold ] ; then
+			mkdir $StreamFold
+		fi
+
+			# Creat sub stream folders
+			for j in pre '' post ; do
+				SubStream="$StreamFold/${j}${SubSNames[$i]}"
+				if [ ! -d $SubStream ] ; then
+					mkdir $SubStream
+				fi
+
+			# Create the subject (and session) folders
+			if [ ! -z $SessID ] ; then
+				mkdirFromFile $SubStream $SubjID $SessID
+			else
+				mkdirFromFile $SubStream $SubjID
+			fi
+		done
+	fi
+done

@@ -1,0 +1,218 @@
+#!/bin/bash
+
+# Requirements for this script
+#  installed versions of: FSL (including python with numpy, needed to run aff2rigid - part of FSL)
+#  installed version of DTITK
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}:	Tool for creating a 6 DOF alignment of the AC, ACPC line and hemispheric plane in MNI space.
+		First of a collection of tools for analysis of structural images.
+		It requires a pre-defined directory structure. This can be obtained using "set_longAn" tool.
+
+Usage: ${script_name}
+  --wrkdir=<working_dir>
+  --in=<inputVolume_list>
+  --subjid=<subjID_list>
+  [--sessid=<sessID_list>]
+  [--t2w]
+  [--noReorient]
+  [--noCrop]
+  [--std=<stdvol>]
+
+========================
+
+<working_dir>:		Should be the same used in set_longAn.
+
+<inputVolume_list>:	A text file containing a list of paths to the input structural images.
+			Full path is recommended. T1w image type is assumed by default.
+			The number of lines MUST be equal to the product of the line number of
+			<subjID_list> and <sessID_list>.
+
+<subjID_list>		List of subject's IDs. Should be consistent with those used in set_longAn.
+
+<sessID_list>		List of session's IDs. Should be consistent with the one used in set_longAn.
+
+--t2w: 			The input volumes are a T2w image.
+
+--noReorient: 	Don't run reorientation.
+		Reorientation matches the orientaion of the standard template. It makes the 
+		images appear "the same way around" in FSLview.
+		Check https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Orientation%20Explained
+		for more info.
+
+--noCrop:	Don't Corp. Crop reomoves neck and lower head.
+
+--std:		Use a different stndard for registration (not implemented yet)/
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+#  Verify required environment variables are set and log value
+# ------------------------------------------------------------------------------
+
+if [ -z $FSLDIR ] ; then
+  echo "${script_name}: ABORTING: FSLDIR environment variable must be set"
+  exit 1
+fi
+
+if [ -z "${DTITK_ROOT}" ]
+then
+        echo "${script_name}: ABORTING: DTITK_ROOT environment variable must be set"
+        exit 1
+fi
+
+# source dtitk_common.sh
+. ${DTITK_ROOT}/scripts/dtitk_common.sh
+
+################################## SUPPORT FUNCTIONS ###################################################
+
+# funtion for parsing options
+getopt1() {
+	sopt="$1"
+	shift 1
+	for fn in $@; do
+		if [ `echo $fn | grep -- "^${sopt}=" | wc -w` -gt 0 ] ; then
+			echo $fn | sed "s/^${sopt}=//"
+			return 0
+		fi
+	done
+}
+
+# funtion for parsing options
+getopt2() {
+        sopt="$1"
+        shift 1
+        for fn in $@; do
+                if [ `echo $fn | grep -- "^${sopt}" | wc -w` -gt 0 ] ; then
+			echo 1
+                        return 0
+                fi
+        done
+	echo 0
+}
+
+# function for perform acpc
+doAcpc() {
+	# parce the inputs
+	count=$1
+	WD=$2
+	VolIn=$3
+	IsT2w=$4
+	DontReorient=$5
+	DontCrop=$6
+	Subj=$7
+	Sess=$8
+	# increment the counter
+	count=$(($count + 1))
+	# Read the corresponding input filename
+	Input=`sed "${count}!d" $VolIn`
+	# Define the output directory
+	if [ -z ${Sess} ] ; then SessDir="$WD/anat/preFS/${Subj}"
+	else SessDir="$WD/anat/preFS/${Subj}/${Sess}" ; fi
+	# Create a subfolder for the specific input type (T1w or T2w)
+	if [ ! $IsT2w -eq 0 ] ; then DataType=T2w
+	else DataType=T1w ; fi
+
+	OutDir="${SessDir}/${DataType}"	
+
+	if [ ! -d $OutDir ] ; then mkdir $OutDir ; fi
+
+	# Extract the Input base name without exension
+	InName=`basename "$Input"`
+	InFileCp="${OutDir}/${InName}"	# use thi to create a link of the input file in the wrk dir
+	InName=`getTVPrefix $InName` # Remove the extension for the output base name definition
+	
+	# Creat a copy of the input image via a soft link
+	if [ ! -L $InFileCp ] ; then ln -s $Input $InFileCp ; fi
+	
+	# Define the ACPC output name
+	Output="${OutDir}/${InName}_acpc"
+
+	# define the base command
+	acpcCmd="acpc_align --in=${Input} --out=${Output}"
+
+	# add features if needed
+	if [ ! $IsT2w -eq 0 ]; then acpcCmd="${acpcCmd} --t2w" ; fi
+	if [ ! $DontReorient -eq 0 ]; then acpcCmd="${acpcCmd} --noReorient" ;fi
+	if [ ! $DontCrop -eq 0 ]; then acpcCmd="${acpcCmd} --noCrop" ; fi
+	
+	# Run the ACPC alignment
+	echo "Subject $Subj, Session $Sess"
+	$acpcCmd
+	
+}
+
+defaultopt() {
+    echo $1
+}
+
+################################### OUTPUT FILES #####################################################
+
+
+################################### OPTIONS PARSING ###################################################
+
+WD=`getopt1 "--wrkdir" $@`  # "$1"
+VolIn=`getopt1 "--in" $@`  # "$2"
+SubjID=`getopt1 "--subjid" $@`  # "$3"
+SessID=`getopt1 "--sessid" $@`  # "$4"
+IsT2w=`getopt2 "--t2w" $@`  # "$5"
+DontReorient=`getopt2 "--noReorient" $@`  # "$6"
+DontCrop=`getopt2 "--noCrop" $@`  # "$7"
+
+
+################################# DO WORK #############################################################
+
+# First check consistency of the input volume list, subject ID list and session ID list
+nVolIn_lines=`wc -l ${VolIn} | awk '{ print $1 }'` # lnegth of the input volume file
+nSubj_lines=`wc -l $SubjID | awk '{ print $1 }'` # length of the subject ID file
+if [ -z $SessID ] ; then
+	nSubjxSess_lines=$nSubj_lines
+else
+	nSess_lines=`wc -l $SessID | awk '{ print $1 }'` # length of the session ID file
+	nSubjxSess_lines=$(($nSubj_lines * $nSess_lines)) # product of the lengths
+fi
+if [ ! $nVolIn_lines -eq $nSubjxSess_lines ] ; then
+  echo "Error: length of ${VolIn} must be consistent with subject and session lists."
+  exit 1
+fi
+
+# Loop over the input file lines
+count=0 # counter to read from input volume list
+# loop over subject list
+while IFS1= read -r Subj ; do
+	if [ ! -z $SessID ] ; then
+		# loop over session list if exists
+		while IFS2= read -r Sess ; do
+			# Do the ACPC alignment
+			doAcpc $count $WD $VolIn $IsT2w $DontReorient $DontCrop $Subj $Sess
+		done  < "$SessID"
+	else
+		# Do the ACPC alignment
+		doAcpc $count $WD $VolIn $IsT2w $DontReorient $DontCrop $Subj
+	fi
+done < "$SubjID"
+
+
+
+
+
+
+
+
+
+

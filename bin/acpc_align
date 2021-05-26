@@ -1,0 +1,228 @@
+#!/bin/bash
+
+# Requirements for this script
+#  installed versions of: FSL (including python with numpy, needed to run aff2rigid - part of FSL)
+#  installed version of DTITK
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}: Tool for creating a 6 DOF alignment of the AC, ACPC line and hemispheric plane in MNI space
+
+Usage: ${script_name}
+  --in=<invol>
+  [--t2w]
+  [--noReorient]
+  [--noCrop]
+  [--out=<ouput>]
+  [--std=<stdvol>]
+
+========================
+
+<invol> is the input volume. It should be a T1w.
+
+--t2w: 		the input volume is a T2w image.
+
+--noReorient: 	Don't run reorientation.
+		Reorientation matchs the orientaion of the standard template. It makes the 
+		images appear "the same way around" in FSLview.
+		Check https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Orientation%20Explained
+		for more info.
+
+--noCrop:	Don't Corp. Crop reomoves neck and lower head.
+
+--out:		Specify the folder and ouput basename. If not specified the output
+		will be saved in the current directory. The ACPC aligned volume will 
+		be named  <invol>_acpc.
+
+--std:		Use a different stndard for registration.
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+#  Verify required environment variables are set and log value
+# ------------------------------------------------------------------------------
+
+if [ -z $FSLDIR ] ; then
+  echo "${script_name}: ABORTING: FSLDIR environment variable must be set"
+  exit 1
+fi
+
+if [ -z "${DTITK_ROOT}" ]
+then
+        echo "${script_name}: ABORTING: DTITK_ROOT environment variable must be set"
+        exit 1
+fi
+
+# source dtitk_common.sh
+. ${DTITK_ROOT}/scripts/dtitk_common.sh
+
+################################## SUPPORT FUNCTIONS ###################################################
+
+# funtion for parsing options
+getopt1() {
+	sopt="$1"
+	shift 1
+	for fn in $@; do
+		if [ `echo $fn | grep -- "^${sopt}=" | wc -w` -gt 0 ] ; then
+			echo $fn | sed "s/^${sopt}=//"
+			return 0
+		fi
+	done
+}
+
+# funtion for parsing options
+getopt2() {
+        sopt="$1"
+        shift 1
+        for fn in $@; do
+                if [ `echo $fn | grep -- "^${sopt}" | wc -w` -gt 0 ] ; then
+			echo 1
+                        return 0
+                fi
+        done
+	echo 0
+}
+
+defaultopt() {
+    echo $1
+}
+
+################################################### OUTPUT FILES #####################################################
+
+# All except $OutVol and $OutMat variables, are saved in a directory created ad-hoc, named tmpACPC.
+# $OutMat, $OutVol, tmpACPC are created in the current directory or that specified by --out flag:
+
+#     roi2full.mat, full2roi.mat, roi2std.mat, full2std.mat
+#     <invol>_reoriented.nii.gz  (the result of the initial reorientation)
+#     <invol>_robustroi.nii.gz  (the result of the initial cropping)
+#     "$OutMat"  (a 6 DOF mapping from the original image to the ACPC aligned version)
+#     "$OutVol"  (the ACPC aligned image)
+
+
+################################### OPTIONS PARSING ###################################################
+
+VolIn=`getopt1 "--in" $@`  # "$1"
+IsT2w=`getopt2 "--t2w" $@`  # "$2"
+DontReorient=`getopt2 "--noReorient" $@`  # "$3"
+DontCrop=`getopt2 "--noCrop" $@`  # "$4"
+Out=`getopt1 "--out" $@`  # "$5"
+StdLR=`getopt1 "--std" $@`  # "$6"
+StdHR=`getopt1 "--std" $@`  # "$6"
+
+# Default parameters
+
+# input root
+InFileName=`basename "${VolIn}"`
+InPrefx=`getTVPrefix $InFileName`
+
+# The outputs
+if [ -z $Out ] ; then
+	OutDir=$PWD;
+	OutVol="${OutDir}/${InPrefx}_acpc.nii.gz"
+	OutMat="${OutDir}/${InPrefx}_acpc.mat"
+	OutTmpDir="${OutDir}/tmpACPC"
+else
+	OutDir=`dirname "$Out"`
+        OutVol=$Out
+	OutMat=`getTVPrefix $OutVol`
+	OutMat="${OutMat}.mat"
+        OutTmpDir="${OutDir}/tmpACPC"
+fi
+
+# the standard
+if [ -z $StdLR ] ; then
+        StdLR=${FSLDIR}/data/standard/MNI152_T1_2mm;
+        StdHR=${FSLDIR}/data/standard/MNI152_T1_1mm;
+fi
+
+# Define the log file
+logFile="${OutTmpDir}/log.txt"
+
+######################################## DO WORK ###############################################
+
+# Creat the folder to store intermediate results
+if [ ! -d $OutTmpDir ] ; then
+	mkdir $OutTmpDir
+fi
+
+# Create the log file
+> $logFile
+echo "Running AC-PC Alignment" | tee -a $logFile
+echo "Input: ${VolIn}" | tee -a $logFile
+echo "Reference: ${StdHR}" | tee -a $logFile
+echo "Output saved as: ${OutVol}" | tee -a $logFile
+
+# Run reorientation if required
+if [ $DontReorient -eq 0 ] ; then
+	# input volume
+	VolReor="${OutTmpDir}/${InPrefx}_reoriented"
+	# reorient the input volume
+	echo "Running reorientation..." | tee -a $logFile
+	fslreorient2std $VolIn $VolReor
+else
+	VolReor=$VolIn
+fi
+
+# Run cropping if required
+if [ $DontCrop -eq 0 ] ; then
+	# registration matricies
+	roi2fullMat="${OutTmpDir}/roi2full.mat"
+	full2roiMat="${OutTmpDir}/full2roi.mat"
+	# input volume
+	VolRoi="${OutTmpDir}/${InPrefx}_robustroi"
+	echo "Running robust FOV..." | tee -a $logFile
+	# Run the cropping
+	robustfov -i $VolReor -m $roi2fullMat -r $VolRoi -v >> $logFile
+	# invert the output registration matrix
+	echo "Invert output matrix..." | tee -a  $logFile
+	convert_xfm -omat $full2roiMat -inverse $roi2fullMat >> $logFile
+else
+	VolRoi=$VolReor
+fi
+
+# Run ACPC registration
+if [ $IsT2w -gt 0 ] ; then
+	costf=mutualinfo
+else
+	costf=corratio
+fi
+
+# set the outputs
+roi2stdMat="${OutTmpDir}/roi2std.mat"
+full2stdMat="${OutTmpDir}/full2std.mat"
+
+echo "Running flirt..." | tee -a $logFile
+# run an affine registration
+flirt -interp spline -cost $costf -in $VolRoi -ref $StdLR -omat $roi2stdMat -o $OutVol -v >> $logFile
+
+if [ $DontCrop -eq 0 ] ; then
+	echo "Concatenate matricies from full to standard..." | tee -a $logFile
+	convert_xfm -omat $full2stdMat -concat $roi2stdMat $full2roiMat
+else
+	cp $roi2stdMat $full2stdMat
+fi
+
+# Extract the rigid registration
+echo "Extract 6 DOF registration from the 12 DOF one..." | tee -a $logFile
+aff2rigid $full2stdMat $OutMat
+
+# Apply the registration in a single step
+echo "Apply the transformation in a single step..." | tee -a $logFile
+applywarp --rel --interp=spline -i $VolReor -r $StdHR --premat=$OutMat -o $OutVol -v >> $logFile
+
+
+echo "Finished AC-PC Alignment" | tee -a $logFile

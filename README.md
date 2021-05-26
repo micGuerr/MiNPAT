@@ -97,7 +97,7 @@ nano ~/.bashrc
 
 Add the following line at the end of the file
 ```bah
-export PATH="/usr/local/LongitudinalMRI/${PATH}"
+export PATH="/usr/local/LongitudinalMRI/bin:${PATH}"
 ```
 
 

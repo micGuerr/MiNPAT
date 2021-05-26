@@ -26,6 +26,30 @@ Relevant Features
 
 ...
 
+Structure
+=========
+
+LongitudinalMRI is divided in three processing streamlines, each for a different type of data:
+* **Structural**, for anatomical data (T1w, T2w, ...).
+*  **Diffusion**, for diffusuib data.
+*   **Functional**, for functional data.
+
+Each processing streamline is further divided into sub-streams.
+The **structural** stream is divided into:
+* Pre FreeSurfer (preFS)
+* FreeSurfer (FS)
+* Post FreeSurfer (postFS)
+The **diffusion** stream is divided into:
+* Pre model fitting (preMF)
+* Model fitting (MF)
+* Post model fitting (postMF)
+The **functional** stream is divided into:
+* ...
+* ...
+* ...
+
+
+
 Prerequisites
 =============
 

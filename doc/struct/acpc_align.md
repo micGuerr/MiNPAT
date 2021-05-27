@@ -45,6 +45,9 @@ The script also create a folder named "ACPCtmp", in which to store intermediate 
 * The neck and lower head cropping can be skipped by adding the **--noCrop** flag.
 * An alternative template can be used via the **--std** flag.
 
+![Output](../../figures/acpc/acpcOutput.png)
+![Template image](../../figures/acpc/standard.png)
+
 ## Example usage
 
 ```bash

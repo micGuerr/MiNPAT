@@ -34,7 +34,19 @@ DataProcessing/diff
 DataProcessing/func
 ```
 one for each analysis stream.
-Within each stream subfolder, it will create a folder for each subject ID specified in the subject list.
+Within each stream subfolder, the sub-stram folders will be created:
+```bash
+DataProcessing/anat/preFs
+DataProcessing/anat/FS
+DataProcessing/anat/postFS
+DataProcessing/diff/preMF
+DataProcessing/diff/MF
+DataProcessing/diff/postMF
+DataProcessing/func/...
+...
+```
+
+Finally, within each sub-folder, a folder for each subject ID, specified by the subject list, will be created.
 
 If the subjectList.txt file is:
 ```text
@@ -45,10 +57,10 @@ subj-02
 
 the following folders will be created
 ```bash
-DataProcessing/anat/subj-01
-DataProcessing/anat/subj-02
+DataProcessing/anat/preFs/subj-01
+DataProcessing/anat/preFs/subj-02
 ...
-DataProcessing/func/subj-XX
+DataProcessing/func/.../subj-XX
 ```
 
 ### Optional argument
@@ -68,10 +80,10 @@ DataProcessing/func/subj-XX
   ```
   the following folders will be created
   ```bash
-  DataProcessing/anat/subj-01/ses-01
-  DataProcessing/anat/subj-01/ses-02
+  DataProcessing/anat/preFS/subj-01/ses-01
+  DataProcessing/anat/preFS/subj-01/ses-02
   ...
-  DataProcessing/func/subj-XX/ses-YY
+  DataProcessing/func/.../subj-XX/ses-YY
   ```
   
 * Specific streams can be selsectively initiated usign the glags **--anat**, **--dwi**, **--func**.

@@ -9,6 +9,7 @@ The aim of this step is three-fold:
 
 ## Problem
 
+![pip](figures/acpc/rawT1w.png)
 
 
 ## Prerequsites

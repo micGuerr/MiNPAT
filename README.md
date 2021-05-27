@@ -24,10 +24,7 @@ The aim of LongitudinalMRI is to fil this gap.
 Semi-standardized data organization
 ===================================
 
-LongitudinalMRI offers a way to organize the output files from processing and analysis in a semi-standardized fashion. The way MRI data processing and analysis result in big number of derived files complicated derivatives which can be arranged in many different ways. Although consensus on the way derivatives should be organized is almost impossible, as ite depends on the different processing steps needed, here we thought to offer a standard strucutre in which to organize the data.
-Such structure is inspired by BIDS standard, but it does not follow any strict ffege.
-Moreover ...
-There are two possible workflows when using LongitudinalMRI tools. In the first, standard and more flexible, is to specify for each tool the input and 
+LongitudinalMRI offers a way to organize the numerous files originating from processing and analysis in a semi-standardized fashion. This is useful as it homogenazie the output organization at it makes the output of the analysis more easy to read. To access this utility the [set_longAn](doc/set_longAn.md) function must be run first.
 
 Structure
 =========

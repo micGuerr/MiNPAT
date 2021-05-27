@@ -10,6 +10,28 @@ There is no consensus about the output file organization.
 This can lead to misunderstanding, errors and time wasted rearranging the data.
 set_longAn sets a standardized backbone folder strucutre which is capitalized by the other LongitudinaMRI tools to create a semi-standard output file organization.
 
+```bash
+dataProcessing/
+└── anat
+ │  └── preFS
+ │  │   └── sub-01
+ │  │   │   ├── ses-01
+ │  │   │   ├── ses-02
+ │  │   │   └── ...
+ │  │   └── ...
+ │  ├── FS
+ │  │   └── ...
+ │  │
+ │  ├── postFS
+ │      └── ...
+ ├── dwi
+ │   └── preMF
+ │   ├── MF
+ │   └── postMF
+ └── func
+     └── ...
+```
+
 ## Usage
 
 ### Input
@@ -30,7 +52,7 @@ It will create three sub-folders named
 
 ```bash
 DataProcessing/anat
-DataProcessing/diff
+DataProcessing/dwi
 DataProcessing/func
 ```
 one for each analysis stream.
@@ -39,9 +61,9 @@ Within each stream subfolder, the sub-stram folders will be created:
 DataProcessing/anat/preFs
 DataProcessing/anat/FS
 DataProcessing/anat/postFS
-DataProcessing/diff/preMF
-DataProcessing/diff/MF
-DataProcessing/diff/postMF
+DataProcessing/dwi/preMF
+DataProcessing/dwi/MF
+DataProcessing/dwi/postMF
 DataProcessing/func/...
 ...
 ```
@@ -93,5 +115,3 @@ DataProcessing/func/.../subj-XX
   set_longAn --wrkdir=~/DataProcessing --anat --func
   ```
   Only the structural and functional streams will be initializated.
-
-

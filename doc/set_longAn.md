@@ -119,6 +119,7 @@ DataProcessing/func/.../subj-XX
   
 ## Possible improvements
 
+### plot the tree
 You could plot the tree structure to std and to a file.
 
 command is something like:
@@ -132,3 +133,4 @@ you need to download the tree command in bash
 ```bash
  sudo apt install tree
  ```
+### ...

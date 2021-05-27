@@ -13,8 +13,8 @@ set_longAn sets a standardized backbone folder strucutre which is capitalized by
 ```bash
 dataProcessing/
 └── anat
- │  └── preFS
- │  │   └── sub-01
+ │  ├── preFS
+ │  │   ├── sub-01
  │  │   │   ├── ses-01
  │  │   │   ├── ses-02
  │  │   │   └── ...
@@ -22,10 +22,10 @@ dataProcessing/
  │  ├── FS
  │  │   └── ...
  │  │
- │  ├── postFS
+ │  └── postFS
  │      └── ...
  ├── dwi
- │   └── preMF
+ │   ├── preMF
  │   ├── MF
  │   └── postMF
  └── func

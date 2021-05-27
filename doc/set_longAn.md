@@ -115,3 +115,20 @@ DataProcessing/func/.../subj-XX
   set_longAn --wrkdir=~/DataProcessing --anat --func
   ```
   Only the structural and functional streams will be initializated.
+  
+  
+## Possible improvements
+
+You could plot the tree structure to std and to a file.
+
+command is something like:
+```bash
+tree -d dataProcessing
+```
+
+the flag could be --qc.
+
+you need to download the tree command in bash
+```bash
+ sudo apt install tree
+ ```

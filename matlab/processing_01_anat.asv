@@ -13,9 +13,9 @@
 %% Setup
 
 % inputs for the analysis
-rawdata = ''; % Path to raw NIfTI data. **FILL IT**
-wrkdir = ''; % Path to working directory. Is the folder where the processed data are stored. **FILL IT**
-subid = {'01'}; % Subject IDs. Tells which subjects are analyzed. **FILL IT**
+rawdata = 'TEST'; % Path to raw NIfTI data. **FILL IT**
+wrkdir = 'PIPPO'; % Path to working directory. Is the folder where the processed data are stored. **FILL IT**
+subid = '01'; % Subject IDs. Tells which subjects are analyzed. **FILL IT**
 sesid = {'01', '02', '03', '04', '05'}; % Ssession IDs. Tells which timepoints are analyzed. **FILL IT**
 
 % other useful stuff
@@ -46,6 +46,8 @@ end
 % This step is specific for the type of acquisition you have.
 % It takes in input the path to the folders of the subjects where dicom
 % data are stored.
+% In this step "dicomSub" MUST be consistent with "subid", Make sure the 
+% IDs reflect the same subject.
 % For this step ALL timepoint IDs MUST be specified and ORDERED from first
 % to last, e.g.: 
 %  -> sesid = {'01', '02', '03', '04', '05'}
@@ -53,8 +55,8 @@ end
 
 if do_dcmConversion
     % inputs
-    dicomData = ''; % path to dicom data folder. **FILL IT**
-    dicomSubFolder = {'S01'}; % subject subfolder name in dicomData folder. **FILL IT**
+    dicomData = 'S01/S01'; % path to dicom data folder. **FILL IT**
+    dicomSub = 'S01'; % subject subfolder name in dicomData folder. **FILL IT**
     configFile = 'BIDS_config.json'; % path to dcm2bids configuration file. **FILL IT**
     
     
@@ -65,27 +67,22 @@ if do_dcmConversion
     
     
     % Concatenate dicom folder and subject folder name
-    inDicom = fullfile(dicomData, dicomSubFolder{1});
+    inDicom = fullfile(dicomData, dicomSub);
     % Call function to run conversion
-    dcmConvert(inDicom, subid{1}, sesid, configFile, rawdata);
+    dcmConvert(inDicom, subid, sesid, configFile, rawdata);
     
     %% Perform QC
     % we do it separately for each timepoint
     
     for ss = 1:nSes
         if ss < 5
-            l = qcRawData(rawdata, subid{1}, sesid{ss}, configFile, {'ReceiveCoilName', 'HeadNeck_20'});
+            l = qcRawData(rawdata, subid, sesid{ss}, configFile, {'ReceiveCoilName', 'HeadNeck_20'});
         else
-            l = qcRawData(rawdata, subid{1}, sesid{ss}, configFile);
+            l = qcRawData(rawdata, subid, sesid{ss}, configFile);
         end
     end
 end
-
-if ~l
-    error('Csreful, something is not right!! Check the ouput')
-end
-
-%% Step 1
+    %% Step 1
 
 
 

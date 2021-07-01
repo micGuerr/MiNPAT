@@ -1,0 +1,33 @@
+function l = longan_singleSessionProcessing(subID, sesID, subID_dcm, sesID_dcm)
+% 
+% Run single session processing
+% 
+% Usage:
+%   l = longan_singleSessionProcessing(subID, sesID, subID_dcm, sesID_dcm)
+% 
+% Inputs:
+%   subID       ...
+%   sesID       ...
+%   subID_dcm   ...
+%   sesID_dcm   ...
+% 
+% Outputs:
+%   l           outcome flag
+% 
+% Requirements:
+%   ...
+% 
+% Author:
+%   Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+%% Step 0. DICOM to NIfTI conversion
+
+% It alloes to convert multiple folders as a single time points
+
+% Concatenate dicom folder and subject folder ID
+inDicom = fullfile(DICOMDIR, subID_dcm, sesID_dcm);
+% Run Conversion
+dcmConvert(inDicom, subID, sesID, CONFIGFILE, RAWDIR);
+
+% run QC
+l = qcRawData(rawdata, subID, sesID, CONFIGFILE, {'ReceiveCoilName', 'HeadNeck_20'});

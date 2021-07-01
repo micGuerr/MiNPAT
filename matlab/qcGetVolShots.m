@@ -1,10 +1,10 @@
-function qcCheckVolShots(wrkDir, fList)
+function qcGetVolShots(wrkDir, fList)
 % 
 % Help performing quality check producing orthogonal views from a lis of
 % volumes
 % 
 % Usage:
-%   qcCheckVolShots(wrkDir, fList)
+%   qcGetVolShots(wrkDir, fList)
 % 
 % Inputs:
 %   wrkDir      Path to dcm2bids output directory, better if full path.
@@ -28,7 +28,7 @@ for ii = 1:nF
     % input the full path
     filename = fullfile(wrkDir, fList{ii});
     % Do the job ...
-    getVolSpecOrthoView(filename)
+    getOrthoView_VolAdHoc(filename)
 end
 
 

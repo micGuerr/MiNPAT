@@ -56,7 +56,7 @@ function l = qcRawData(wrkDir, subID, sesID, configFile, varargin)
 
 if l
     % Take volume shots
-    qcCheckVolShots(wrkDir, fList)
+    qcGetVolShots(wrkDir, fList)
 end
     
 

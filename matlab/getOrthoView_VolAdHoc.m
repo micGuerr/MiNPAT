@@ -1,13 +1,21 @@
-function getVolSpecOrthoView(filename)
+function getOrthoView_VolAdHoc(filename)
 % 
 % Merge three shots from orthogonal slice views into a single file. It uses
 % options specific to the input volume type. The type is read from the last
 % letters of the file name, after "_" symbol, as expected from BIDS format.
-% 
-% The images is saved using the same input filename but with a ".png"
-% extension.
 %
-% If the fulitype is not known, default values are used.
+% Usage:
+%   getOrthoView_VolAdHoc(filename)
+%
+% Inputs:
+%   filename    Input volume filename (string).
+%
+% Output:
+%   The picture is saved using the same input filename but with a ".png"
+%   extension.
+%
+%
+% If the filetype is not known, default values are used.
 % 
 % Accteable file types are:
 %   T1w
@@ -44,42 +52,7 @@ ftype = fname( unds(end)+1 : end );
 outname = fullfile(fpath, sprintf('%s.png', fname));
 
 %% Set different options for different file types
-switch ftype
-    case 'T1w'
-        frac = [.5 .3 .7];
-        intensity = [0 600];
-        scale = 2;
-    case 'T2w'
-        frac = [.5 .3 .7];
-        intensity = [0 300];
-        scale = 2;
-    case 'dwi'
-        frac = [.5 .4 .4];
-        intensity = [0 15000];
-        % exception for noise maps
-        if contains(fname, 'noise'); intensity = []; end
-        scale = 3;
-    case {'magnitude1', 'magnitude2'}
-        frac = [.5 .4 .4];
-        intensity = [0 1500];
-        scale = 3.5;
-    case 'phasediff'
-        frac = [.5 .4 .4];
-        intensity = [- 4000 4000];
-        scale = 3.5;
-    case 'epi'
-        frac = [.5 .4 .4];
-        intensity = [0 15000];
-        scale = 3.5;
-    case 'bold'
-        frac = [.5 .4 .4];
-        intensity = [];
-        scale = 3.5;
-    otherwise
-        frac = [];
-        intensity = [];
-        scale = [];
-end
+[frac, intensity, scale] = setPicturePref(ftype);
     
 %% Do the job
 

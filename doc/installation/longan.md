@@ -33,7 +33,7 @@ git clone https://github.com/micGuerr/LongitudinalMRI.git
 ```
 After entering your GitHub username and password the download should start.
 
-NB: keep track of the folder where you cloned LongAnMRI, as it will be need for configuration, later.
+NB: Make sure to keep track of the path to the LongAnMRI folder, as it will be needed for configuration, later.
 
 ## Other downloading options
 Alternatively, you can download the .zip file from the main [LongAnMRI](https://github.com/micGuerr/LongitudinalMRI) page, by pressing on the *code* button and then on *Download ZIP*.

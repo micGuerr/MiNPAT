@@ -2,7 +2,7 @@
 
 ## Download
 The DTI-TK binaries for Linux and Mac/OS can be found at [NITRC](https://www.nitrc.org/frs/?group_id=207).
-select the release adapted for you operating system and start the downloading.
+select the release adapted for your needs and start the downloading.
 A file named `NITRC-multi-file-downloads.zip` should be saved somewhere on your machine.
 
 ## Installation

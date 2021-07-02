@@ -46,6 +46,6 @@ unzip LongitudinalMRI.zip
 
 Move the unzipped folder to a target location, e.g.:
 ```bash
-mv LongitudinalMRI ~/Documents
+mv LongitudinalMRI ~/Documents/
 ```
 

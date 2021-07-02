@@ -1,13 +1,24 @@
-LongitudinalMRI
-===============
-Michele Guerreri
+# LongAnMRI
 
-May 2021
+The Longitudinal MRI analysis (LongAnMRI) provides a set of tools for MRI data pre-processing, image phenotype derivation and data analysis, with a specific focus on longitudinal acquisitions.
 
-Purpose
-=======
+# Installation
 
-LongitudinalMRI provides a set of tools for MRI data processing and analysis, with a specific focus on longitudinal acquisitions.
+You can find the instruction to download and install LongAnMRI [here](doc/installation/longan.md).
+
+## Download and instal extenral softwares
+
+LongAnMRI makes use of a numeber of external softwares. Below you can find the instructions on how to download them and, for some of them, a brief summary on the installation steps.
+
+- Most of LongAnMRI core features are written in Bash, however **[Matlab](https://it.mathworks.com/products/matlab.html)** scripts and functions are used to run the analysis, hence it is essential to have the software installed.
+- **[DTI-TK](doc/installation/dtitk.md)**.
+- **[FSL](doc/installation/fsl.md)**.
+- **[FreeSurfer](doc/installation/fs.md)**.
+- **[NODDI MATLAB toolbox](doc/installation/nodditbx.md)**.
+- **[dcm2niix/dcm2bids](doc/installation/dcm2nii.md)**.
+
+NB: It is important to keep track of the locations where the softwares are installed. This information will be used for their configuration, later.
+
 
 Motivation
 ==========

@@ -1,5 +1,8 @@
 # LongAnMRI Download
 
+The following instructions are compatible with Linux based and macOS systems.
+If you use Windows, you can run the same commands from any linux-based app available for Windows, such as [Ubuntu](https://www.microsoft.com/en-gb/search?q=ubuntu).
+
 ## Check git is installed
 The esasiest way to download the software is from terminal via the `git` command.
 

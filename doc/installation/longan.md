@@ -38,11 +38,11 @@ NB: keep track of the folder where you cloned LongAnMRI, as it will be need for 
 ## Other downloading options
 Alternatively, you can download the .zip file from the main [LongAnMRI](https://github.com/micGuerr/LongitudinalMRI) page, by pressing on the *code* button and then on *Download ZIP*.
 
-Next, navigate to the `Downloads` folder:
+Next, from terminal, navigate to the downloading folder, e.g.:
 ```bash
 cd ~/Downloads
 ```
-Unzip the file (you will need to have the `zip` command installed):
+Unzip the downloaded file (you will need to have the `zip` command installed):
 ```bash
 unzip LongitudinalMRI.zip
 ```

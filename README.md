@@ -2,15 +2,23 @@
 
 The Longitudinal MRI analysis (LongAnMRI) provides a set of tools for MRI data pre-processing, image phenotype derivation and data analysis, with a specific focus on longitudinal acquisitions.
 
-# Installation
+# Requirements, download and Installation
+
+The Software is compatible with both Linux and macOS based machines. It can be used with Windows operating system, but a few [extra steps]() need to be taken.
+If not specified, all the steps indicated here apply to all platforms (with some small adaptations).
 
 You can find the instruction to download and install LongAnMRI [here](doc/installation/longan.md).
 
-## Download and instal extenral softwares
+## Matlab and Python
+
+Most of LongAnMRI core features are written in Bash and can be run from command line. Nonetheless, **[Matlab](https://it.mathworks.com/products/matlab.html)** scripts and functions are used to organize and simplify the diffent steps of the analysis, hence it is essential to have the software installed.
+
+Also, both a version of Python-2 and Python-3 should be installed, as they are needed in a number of different situations. Check [here] for more info. 
+
+## Download and install extenral softwares
 
 LongAnMRI makes use of a numeber of external softwares. Below you can find the instructions on how to download them and, for some of them, a brief summary on the installation steps.
 
-- Most of LongAnMRI core features are written in Bash, however **[Matlab](https://it.mathworks.com/products/matlab.html)** scripts and functions are used to run the analysis, hence it is essential to have the software installed.
 - **[DTI-TK](doc/installation/dtitk.md)**.
 - **[FSL](doc/installation/fsl.md)**.
 - **[FreeSurfer](doc/installation/fs.md)**.
@@ -19,6 +27,7 @@ LongAnMRI makes use of a numeber of external softwares. Below you can find the i
 
 NB: It is important to keep track of the locations where the softwares are installed. This information will be used for their configuration, later.
 
+## Setup paths/variables in MATLAB
 
 Motivation
 ==========

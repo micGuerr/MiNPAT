@@ -27,5 +27,7 @@ Make sure to keep track of the path to the uncompressed DTI-TK folder (in this e
 
 Further information about DTI-TK can be found [here](http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Main.HomePage).
 
+## Donwload and install DTI-TK addons
 
+...
 

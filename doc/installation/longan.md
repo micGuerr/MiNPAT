@@ -1,9 +1,8 @@
-# LongAnMRI Download
+# LongAnMRI Download and installation
 
-The following instructions are compatible with Linux based and macOS systems.
-If you use Windows, you can run the same commands from any Linux-based app available for Windows, such as the [Ubuntu app](https://www.microsoft.com/en-gb/search?q=ubuntu).
+## Download
 
-## Check git is installed
+### Check git is installed
 The best way to download the software is from terminal via the `git` command.
 
 Check whether you have `git` installed, by running the following command from [terminal](https://towardsdatascience.com/a-quick-guide-to-using-command-line-terminal-96815b97b955):
@@ -15,13 +14,13 @@ If you get an error instead, you will need to install git by following [this](ht
 
 You will also need to sign up to [GitHub](https://github.com/) before proceeding to the next step.
 
-## Clone LongAnMRI
+### Clone LongAnMRI
 Navigate to the folder where you would like to save LongAnMRI via the `cd` command.
 ```bash
 cd <path_to_folder>
 ```
 An appropriate folder choice could be `/usr/local` but you will need [superuser privileges](https://en.wikipedia.org/wiki/Superuser) to download the LongAnMRI.
-Alternatively, you can use other locations such as `~/Documents`.
+Alternatively, you can use other locations such as `/Users/username/Apps`.
 
 Once you changed directory you can run:
 ```bash
@@ -35,20 +34,33 @@ After entering your GitHub username and password the download should start.
 
 NB: Make sure to keep track of the path to the LongAnMRI folder, as it will be needed for configuration, later.
 
-## Other downloading options
+### Other downloading options
 Alternatively, you can download the .zip file from the main [LongAnMRI](https://github.com/micGuerr/LongitudinalMRI) page, by pressing on the *code* button and then on *Download ZIP*.
 
-Next, from terminal, navigate to the downloading folder, e.g.:
+Assuming the file has been downloaded in the `/Users/username/Downloads/` folder, move the file into a target location, e.g.:
 ```bash
-cd ~/Downloads
+mv /Users/username/Downloads/LongitudinalMRI /Users/username/Apps/
 ```
-Unzip the downloaded file (you will need to have the `zip` command installed):
+
+Next, navigate to the target directory, e.g.:
+```bash
+cd /Users/username/Apps/
+```
+Unzip the compressed file (you will need to have the `zip` command installed):
 ```bash
 unzip LongitudinalMRI.zip
 ```
 
-Move the unzipped folder to a target location, e.g.:
+### Setup paths
+In case *you don't plan* to youse the Matlab scritps, you can add LongAnMRI to the searching paths by typing the following command from command line:
 ```bash
-mv LongitudinalMRI ~/Documents/
+export PATH="<path_to_folder>/LongitudinalMRI/bin:${PATH}"
 ```
+In order to make this change permanent you should add this line to the appropriate file (based on your operating system).
+
+
+
+
+
+
 

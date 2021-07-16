@@ -10,7 +10,7 @@ To do so, make sure you have `git` installed by typing on a teminal window the f
 git --version
 ```
 Something like `git version 2.17.1` should be prompted.
-In case you get an error instead, you can follow [this](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) simple guide.
+In case you get an error instead, you can install git following [this](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) simple guide.
 
 ### Clone LongAnMRI
 Navigate to the folder where you would like to save LongAnMRI via the `cd` command. Run the following command from terminal, substituting the <path_to_folder> with the path of your target folder:

@@ -1,22 +1,28 @@
-# LongAnMRI
+# NeuroPlasticity Microstructural Analysis Toolbox (...)
 
-The Longitudinal MRI analysis (LongAnMRI) provides a set of tools for MRI data pre-processing, image phenotype derivation and data analysis, with a specific focus on longitudinal acquisitions.
+This software intends to provide a set of tools and an analysis framework for the detection of microstructural brain changes.
 
-# Requirements, download and Installation
+It has been specifically designed for the analysis of neuroplastic changes and thus offers specific features for the processing of data where multiple acquisitions are available for each subject.
 
-The Software is compatible with both Linux and macOS based machines. It can be used with Windows operating system as well, but a few [extra adjustments]() are needed.
+Nonetheless, the pipeline offers strams of analysis for single session acquisitions as well.
+
+# Requirements, Download and Installation
+
+The Software is compatible with both Linux and macOS based machines. It can also be used with Windows operating system, but some [extra requirements]() are needed.
 
 You can find the instructions to download and install LongAnMRI [here](doc/installation/longan.md).
 
 ## Matlab and Python
 
-Most of LongAnMRI core features are written in Bash and can be run from command line. Nonetheless, **[Matlab](https://it.mathworks.com/products/matlab.html)** scripts and functions are used to organize and simplify the diffent steps of the analysis, hence the software should be installed.
+The analysis framework is based on **[Matlab](https://it.mathworks.com/products/matlab.html)** scripts and functions, hence you must have an installed Matlab version (minumum version ??).
 
-Also, both a version of Python-2 and Python-3 should be installed, as they are needed in a number of different situations. Check [here]() for more info. 
+Also, both a Python-2 and Python-3 versions should be installed, as they are needed in a number of different situations. Check [here]() for more info.
 
 ## Download and install extenral softwares
 
-LongAnMRI makes use of a numeber of external softwares. Below you can find the instructions on how to download them and, for some of them, a brief summary on the installation steps.
+LongAnMRI makes use of a numeber of external software which must be donwloaded and installed.
+The full list is reported below.
+Clicking on the links you will find a brief overview on how to donwload and install each of them.
 
 - **[DTI-TK](doc/installation/dtitk.md)**.
 - **[FSL](doc/installation/fsl.md)**.
@@ -24,7 +30,42 @@ LongAnMRI makes use of a numeber of external softwares. Below you can find the i
 - **[NODDI MATLAB toolbox](doc/installation/nodditbx.md)**.
 - **[dcm2niix/dcm2bids](doc/installation/dcm2nii.md)**.
 
-NB: It is important to keep track of the locations where the softwares are installed. This information will be used for their configuration (next step).
+NB: It is important to keep track of the location on your machine (paths) where the softwares are installed. This information will be used for their configuration (check next steps).
+
+## Get started
+
+In oreder to get started, make sure you added the `LongAnMRI/matlab` folder to your MATLAB PATH ( check the [installation page](doc/installation/longan.md) for more info).
+
+### Start a new analysis project
+
+The first step to start a new analysis is to create the folder structure in which all the unprocessed (*raw*) data, pre-processed data, and analysed data will be stored.
+You can do this via the `newAalysis()` MATLAB function.
+
+Launch MATLAB and run the following command from command window:
+```matalb
+newAalysis('<path_to_new_project_folder>', '<path_DICOM_data>')
+```
+
+`'<path_to_new_project_folder>'` being the path to the folder where the output of the analysis will be stored. For example, it could be something like `/Users/<username>/myAnalyses/NewPlasticityProject`
+
+`'<path_DICOM_data>'` being the path to the parent folder in which your acquired DICOM data are stored. This should NOT include subject subfolders. For example, if your DICOM data are organized in the following way:
+```bash
+/Users/<username>/myProjectDICOMs/
+├── subj-01
+│   ├── ses-01
+│   └── ses-02
+├── subj-02
+│   ├── ses-01
+│   └── ses-02
+├── subj-03
+│   ├── ses-01
+│   └── ses-02
+├──...
+```
+The `'<path_DICOM_data>'` should be `'/Users/<username>/myProjectDICOMs'`.
+
+NOTE: DICOM data are note compulsory but highly recommended. Check [here]() if you don't have access to DICOM data.
+
 
 ## Setup paths/variables in MATLAB
 

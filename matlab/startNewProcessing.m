@@ -106,8 +106,8 @@ update_pathSetup(pathSetup_dest, {'NODDI'}, ...
                     {noddi_path} );
                 
 % Update other software paths (dcm2niix, dcm2bids)
-[niixStatus, dcm2niix_path] = system('which dcm2niix', '-echo');
-[bidsStatus, dcm2bids_path] = system('which dcm2bids', '-echo');
+[niixStatus, dcm2niix_path] = runSystemCmd('which dcm2niix', 0);
+[bidsStatus, dcm2bids_path] = runSystemCmd('which dcm2bids', 0);
 
 if ~isempty(dcm2niix_path) && ~niixStatus; dcm2niix_path = erase( dcm2niix_path,'dcm2niix'); end
 if ~isempty(dcm2bids_path) && ~bidsStatus; dcm2bids_path = erase( dcm2bids_path,'dcm2bids'); end

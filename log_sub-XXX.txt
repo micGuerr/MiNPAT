@@ -1,0 +1,70 @@
+%% SUBJECT ANALYSIS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Script for single subject pre-processing and IDP generation.
+%
+% NB: DO NOT MODIFY THIS FILE!
+%     Make a copy of it, adapt to your paths and rename it to "processingLogBook.m"
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Write here the name of the DICOM folder of the subject
+subid_dcm = ''; % e.g. 'xxxxx'
+%% Write here the ID you would like to assigne to this subject
+subid = ''; % e.g. '001'
+
+%% SINGLE SESSION PROCESSING
+%% Session #1
+
+% Write here the name of the DICOM folder for the first session of this subject
+sesid_01_dcm = ''; % e.g. 's56454'
+% Write here the ID you would like to assigne to this session
+sesid_01 = ''; % e.g. '001'
+
+% This function runs the full single session analysis.
+l1 = longan_singleSessionProcessing(subid, sesid_01, subid_dcm, sesid_01_dcm);
+
+%% Session #2
+
+% Write here the name of the DICOM folder for the first session of this subject
+sesid_02_dcm = '';
+% Write here the ID you would like to assigne to this session
+sesid_02 = ''; 
+
+% This function runs the full single session analysis.
+l2 = longan_singleSessionProcessing(subid, sesid_02, subid_dcm, sesid_02_dcm);
+
+
+%% Session #3
+
+% Write here the name of the DICOM folder for the first session of this subject
+sesid_03_dcm = ''; 
+% Write here the ID you would like to assigne to this session
+sesid_03 = ''; 
+
+% This function runs the full single session analysis.
+l3 = longan_singleSessionProcessing(subid, sesid_03, subid_dcm, sesid_03_dcm);
+
+%% Session #4
+
+% Write here the name of the DICOM folder for the first session of this subject
+sesid_04_dcm = ''; 
+% Write here the ID you would like to assigne to this session
+sesid_04 = ''; 
+
+% This function runs the full single session analysis.
+l4 = longan_singleSessionProcessing(subid, sesid_04, subid_dcm, sesid_04_dcm);
+
+%% Session #5
+
+% Write here the name of the DICOM folder for the first session of this subject
+sesid_05_dcm = ''; 
+% Write here the ID you would like to assigne to this session
+sesid_05 = ''; 
+
+% This function runs the full single session analysis.
+l5 = longan_singleSessionProcessing(subid, sesid_05, subid_dcm, sesid_05_dcm);
+
+
+%% MULTI-SESSION PROCESSING
+l = longan_multiSessionProcessing(subid, sesid_01, sesid_02, sesid_03, sesid_04, sesid_05);

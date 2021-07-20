@@ -32,7 +32,7 @@ fclose(fid);
 n_fields = length(fields);
 
 for ff = 1 : n_fields
-    idx = find( strcmp(C, [fields{ff} ' = ']));
+    idx = find(contains(C,[fields{ff} ' = ']));
     if ~isempty(idx)
         C{idx} = [fields{ff} ' = ' paths{ff}];
     end

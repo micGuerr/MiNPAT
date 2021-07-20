@@ -101,16 +101,16 @@ update_pathSetup(pathSetup_dest, {'FSLDIR', 'FREESURFER_HOME', 'DTITK'}, ...
                 
 % Update Matlab toolboxes paths
 noddi_path = erase(erase(erase(which('SynthMeasWatsonSHStickTortIsoV_B0'), ...
-                'SynthMeasWatsonSHStickTortIsoV_B0.m', 'watson', 'models')));
+                'SynthMeasWatsonSHStickTortIsoV_B0.m'), 'watson'), 'models');
 update_pathSetup(pathSetup_dest, {'NODDI'}, ... 
                     {noddi_path} );
                 
 % Update other software paths (dcm2niix, dcm2bids)
-[~, dcm2niix_path] = system('which dcm2niix', '-echo');
-[~, dcm2bids_path] = system('which dcm2bids', '-echo');
+[niixStatus, dcm2niix_path] = system('which dcm2niix', '-echo');
+[bidsStatus, dcm2bids_path] = system('which dcm2bids', '-echo');
 
-if ~isempty(dcm2niix_path); dcm2niix_path = erase( dcm2niix_path,'dcm2niix'); end
-if ~isempty(dcm2bids_path); dcm2bids_path = erase( dcm2bids_path,'dcm2bids'); end
+if ~isempty(dcm2niix_path) && ~niixStatus; dcm2niix_path = erase( dcm2niix_path,'dcm2niix'); end
+if ~isempty(dcm2bids_path) && ~bidsStatus; dcm2bids_path = erase( dcm2bids_path,'dcm2bids'); end
 
 update_pathSetup(pathSetup_dest, {'DCM2NIIX', 'DCM2BIDS'}, ... 
                     {dcm2niix_path, dcm2bids_path} );

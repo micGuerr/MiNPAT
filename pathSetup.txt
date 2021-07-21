@@ -1,3 +1,4 @@
+function pathSetup()
 %
 % Initialization for Longitudinal Analysis MRI
 %
@@ -8,36 +9,35 @@
 global FSLDIR
 global DTITK
 global FREESURFER_HOME SUBJECTS_DIR
-global DCM2NIIX DCM2BIDS
-global LONGANMRI
+global DICOM2NIIX DICOM2BIDS
 global NODDI
-global DCMDIR RAWDIR POPANDIR SUBANDIR
+global LONGANPATH
+global DICOMDIR RAWDIR POPANDIR SUBANDIR
 
 
 %% Path definition: adapt these to your needs
 % ==========================================
 
 % sofrware paths
-DCM2NIIX = '';          % MODIFY !! full path to dcm2niix directory
-DCM2BIDS = '';          % MODIFY !! full path to dcm2bids directory
 FSLDIR = '';            % MODIFY !! full path to FSL directory
 DTITK = '';             % MODIFY !! full path to DTI-TK directory
 FREESURFER_HOME = '';   % MODIFY !! full path to freeSurfer directory
-LONGANMRI = '';         % MODIFY !! full path to LonganMRI toolbox
+DICOM2NIIX = '';        % MODIFY !! full path to dcm2niix directory
+DICOM2BIDS = '';        % MODIFY !! full path to dcm2bids directory
 NODDI = '';             % MODIFY !! full path to NODDI toolbox directory
+LONGANPATH = '';        % MODIFY !! full path to LongAn directory
 
 % Data paths
-DCMDIR = '';            % MODIFY !! full path to DICOM data directory
+DICOMDIR = '';          % MODIFY !! full path to DICOM data directory
 RAWDIR = '';            % MODIFY !! full path to where NIfTI raw data will be stored
-POPANDIR = '';          % MODIFY !! full path for population level analysis output
-SUBANDIR = '';          % MODIFY !! full path for session and subject level analysis output
+POPANDIR = '';          % MODIFY !! full path for popluation level analysis output
+SUBANDIR = '';          % MODIFY !! full path for subject and session level analysis output
 
 % don't modify this unless you know what you are doing
 SUBJECTS_DIR = fullfile(SUBANDIR, 'fs_processing');
 
-%%  Configurations
+%% Set environment variable
+% ==========================================
 
 pathConfig();
-
-
 

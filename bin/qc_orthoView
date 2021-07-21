@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Requirements for this script
+#  installed versions of: FSL (including python with numpy, needed to run aff2rigid - part of FSL)
+# 
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}: Tool for assessing overall image quality, simultaneously for multiple inputs.
+
+Usage: ${script_name} [main options] -o <filename> -v  <vol1> <vol2> ...
+
+Main options: [-L] [-l <lut>] [-s <scale>] [-i <intensitymin> <intensitymax>] [-e <thr>] [-t] [-n] [-u]
+These must be before output options.
+-L       : Label slices with slice number.
+-l <lut> : use a different colour map from that specified in the header.
+-i <min> <max> : specify intensity min and max for display range.
+-e <thr> : use the specified threshold for edges (if >0 use this proportion of max-min, if <0, use the absolute value)
+-t       : produce semi-transparent (dithered) edges.
+-n       : use nearest-neighbour interpolation for output.
+-u       : do not put left-right labels in output.
+-c       : add a red dot marker to top right of image
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+#  Verify required environment variables are set and log value
+# ------------------------------------------------------------------------------
+
+if [ -z $FSLDIR ] ; then
+  echo "${script_name}: ABORTING: FSLDIR environment variable must be set"
+  exit 1
+fi
+################################### PARSING ###################################################
+
+# NEED PARSING IN ORDER TO HAVE A -v OPTION
+inputnames=""
+# if statement checks if -v option was given
+if [ `echo "$@" | grep -- -v | wc -w` -gt 0 ] ; then
+    # extract the <inputs> name if the -v option is present
+    inputnames=`echo "$@" | sed 's/.*-v//'`;
+    #
+    opts=`echo "$@" | sed 's/-v.*//'`;
+else
+    echo "ERROR: flag -v is compulsory!"
+    Usage
+    exit 1
+fi
+
+# NEED PARSING IN ORDER TO HAVE A -o OPTION
+outputname=""
+# if statement checks if -o option was given
+if [ `echo $opts | grep -- -o | wc -w` -gt 0 ] ; then
+    # extract the <output gif> name if the -o option is present
+    outputname=`echo $opts  | sed 's/.*-o *\([^ ]*\).*/\1/'`;
+    #
+    opts=`echo $opts | sed 's/-o *[^ ]*//'`;
+else
+    echo "ERROR: You should provide an output!"
+    Usage
+    exit 1
+fi
+
+
+i=0
+tmp="tmpFile_qa_othoView.ppm"
+# Loop over the inputs
+for vol in $inputnames ; do
+    #
+    slice_cmd="slicer $vol $opts -a $outputname"
+    #
+    echo $slice_cmd
+    #$slice_cmd
+    #
+    if [ $i -gt 0 ] ; then
+         echo "convert $tmp $outputname -append $outputname"
+    fi
+    #
+    #cp $outputname $tmp
+    ((i++))
+done
+#rm $tmp

@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# Requirements for this script
+#  installed versions of: FreeSurfer
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}: Saves to lateral shots of the input surface and overlay
+
+Usage:
+${script_name} --flag=<flag_value>
+
+Compulsory arguments (You MUST set one or more of):
+
+	--ins	Input surface file.
+	--ino	Input overlay file.
+	--out	Output base name.
+
+
+Optional arguments (You may optionally specify one or more of):
+
+	--m	Minimum overlat threshold value.
+	--M	Maximuim overlat threshold value.
+	--cs	Plot color scale
+
+
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+#  Verify required environment variables are set and log value
+# ------------------------------------------------------------------------------
+
+if [ -z $FREESURFER_HOME ] ; then
+  echo "${script_name}: ABORTING: FREESURFER_HOME environment variable must be set"
+  exit 1
+fi
+
+################################## SUPPORT FUNCTIONS ###################################################
+
+# funtion for parsing options
+getopt1() {
+	sopt="$1"
+	shift 1
+	for fn in $@; do
+		if [ `echo $fn | grep -- "^${sopt}=" | wc -w` -gt 0 ] ; then
+			echo $fn | sed "s/^${sopt}=//"
+			return 0
+		fi
+	done
+}
+
+# funtion for parsing options
+getopt2() {
+        sopt="$1"
+        shift 1
+        for fn in $@; do
+                if [ `echo $fn | grep -- "^${sopt}" | wc -w` -gt 0 ] ; then
+			echo 1
+                        return 0
+                fi
+        done
+	echo 0
+}
+
+defaultopt() {
+    echo $1
+}
+
+
+################################### OPTIONS PARSING ###################################################
+
+SurfIn=`getopt1 "--ins" $@`  # "$1"
+OverIn=`getopt1 "--ino" $@`  # "$2"
+Out=`getopt1 "--out" $@`  # "$4"
+m=`getopt1 "--m" $@`  # "$5"
+M=`getopt1 "--M" $@`  # "$6"
+cs=`getopt2 "--cs" $@`  # "$6"
+
+# Check compulsory inputs
+
+if [ -z $SurfIn ] ; then
+	echo "Error: input --ins must be set!"
+fi
+
+if [ -z $OverIn ] ; then
+	echo "Error: input --ino must be set!"
+fi
+
+if [ -z $Out ] ; then
+	echo "Error: input --out must be set!"
+fi
+
+
+
+######################################## DO WORK ###############################################
+
+# Define the basic command
+
+cmd="freeview -f  ${SurfIn}:overlay=${OverIn}"
+
+# add the threshold if needed
+
+if [ ! -z $m ] && [ ! -z $M ]  ; then
+	cmd=" ${cmd}:overlay_threshold=${m},${M}"
+else
+	echo "ERROR: to use threshold, both --m and --M flags must be set!"
+fi
+
+# add the color scale
+
+if [ ! -z $cs ] ; then
+	cmd=" ${cmd}:overlay_threshold=${m},${M} -colorscale"
+fi
+
+
+# Get the lateral shots
+for rot in 0 180; do
+	cmd="${cmd} -layout 1 -viewport 3d -zoom 1.7 -cam azimuth ${rot} -ss ${Out}_${rot}d.png"
+	echo ${cmd}
+	${cmd}
+done

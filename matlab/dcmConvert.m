@@ -1,11 +1,11 @@
-function dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
+function status = dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
 % 
 % Converts dicom files into NIfTI format. The data are authomatically
 % organized into a pre-defined structure which follows the BIDS standard
 % (https://bids.neuroimaging.io/).
 %
 % Usage:
-% dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
+% status = dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
 %
 % Inputs
 %   dcmFolder:  path to the subject folder containing the timepoint
@@ -31,15 +31,16 @@ function dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
 
  % Add error if you try to overwrite
 
+global DICOM2BIDS
 
 % write the command
-dcm2bids_cmd = ['dcm2bids' ...
-    ' -d ' dcmFolder ...
-    ' -p ' subID ...
-    ' -s ' sesID ...
-    ' -c ' configFile ...
-    ' -o ' outpFolder ...
-    ' --forceDcm2niix'];
+dcm2bids_cmd = [fullfile(DICOM2BIDS,'dcm2bids') ...
+                ' -d ' dcmFolder ...
+                ' -p ' subID ...
+                ' -s ' sesID ...
+                ' -c ' configFile ...
+                ' -o ' outpFolder ...
+                ' --forceDcm2niix']; % Overwrite previous temporary dcm2niix output if itexists
 
 % print the string to command line
 fprintf('===============================================\n');
@@ -47,11 +48,9 @@ fprintf('Converting...\n');
 fprintf('Subject ID: %s\n', subID);
 fprintf('Session ID: %s --> %s\n', tpsFplder(ss).name, sesID);
 fprintf('Final command is:\n\n');
-fprintf('%s\n\n',dcm2bids_cmd);
-
 
 % execte the command from the operating system
-    system(dcm2bids_cmd,'-echo');
+status = runSystemCmd(dcm2bids_cmd,1);
 
 
 

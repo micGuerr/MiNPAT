@@ -1,3 +1,4 @@
+function pathSetup()
 %
 % Initialization for Longitudinal Analysis MRI
 %

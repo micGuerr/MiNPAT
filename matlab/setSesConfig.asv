@@ -1,0 +1,27 @@
+function config = setSesConfig()
+% 
+% Creates a default structure with fields in which to store relevant 
+% information for session level analysis of neuroplasticity micostrucutral
+% changes.
+% 
+% Usage:
+%   config = setSesConfig()
+% 
+% no input
+%
+% Output:
+%   config      the structure
+% 
+% Author:
+%   Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+% Define config
+config = struct();
+
+%% dicom 2 nifti conversion related fields
+
+
+%% anatomical analysis related fields
+
+
+%% anatomical analysis related fields

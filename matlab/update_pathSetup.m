@@ -34,7 +34,7 @@ n_fields = length(fields);
 for ff = 1 : n_fields
     idx = find(contains(C,[fields{ff} ' = ']));
     if ~isempty(idx) && ~isempty(paths{ff})
-        C{idx} = [fields{ff} ' = ' paths{ff}];
+        C{idx} = [fields{ff} ' = ''' paths{ff} ''';' ];
     end
 end
 

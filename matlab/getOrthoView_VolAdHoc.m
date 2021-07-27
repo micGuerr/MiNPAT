@@ -52,7 +52,7 @@ ftype = fname( unds(end)+1 : end );
 outname = fullfile(fpath, sprintf('%s.png', fname));
 
 %% Set different options for different file types
-[frac, intensity, scale] = setPicturePref(ftype);
+[frac, intensity, scale] = setPicturePref(ftype, fname);
     
 %% Do the job
 

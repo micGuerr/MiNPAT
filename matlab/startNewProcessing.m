@@ -37,7 +37,7 @@ function startNewProcessing(processingFolder_path, dicomData_path)
 %   logs/                   Stores matlab scripts in which each step of the
 %                           session and subject level analysis is described
 %                           and documented.
-%   logs/log_sub-XXX.txt    Is a template file for sessiona and subject
+%   logs/log_subXXX.txt    Is a template file for sessiona and subject
 %                           level analysis descrition and documentation.
 %   config                  Folder to store configuration files.
 %   config/pathSetup.m      A file for external software configuration.
@@ -80,8 +80,8 @@ mkdir(config)
 
 %% Copy config file and log template into corresponding folders
 
-logSub_source = fullfile(tbx_path, 'log_sub-XXX.txt');
-logSub_dest = fullfile(log, 'log_sub-XXX.txt');
+logSub_source = fullfile(tbx_path, 'log_subXXX.txt');
+logSub_dest = fullfile(log, 'log_subXXX.txt');
 copyfile(logSub_source, logSub_dest);
 
 pathSetup_source = fullfile(tbx_path, 'pathSetup.txt');
@@ -101,8 +101,8 @@ update_pathSetup(pathSetup_dest, {'DICOMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'},
                     {dicomData_path, rawdat, popan, suban} );
                 
 % Update the external softares paths if correctly configured on this system
-update_pathSetup(pathSetup_dest, {'FSLDIR', 'FREESURFER_HOME', 'DTITK'}, ... 
-                    {getenv('FSLDIR'), getenv('FREESURFER_HOME'), getenv('DTITK_ROOT')} );
+update_pathSetup(pathSetup_dest, {'FSLDIR', 'FREESURFER_HOME', 'DTITK', 'IMGMAGICK'}, ... 
+                    {getenv('FSLDIR'), getenv('FREESURFER_HOME'), getenv('DTITK_ROOT'), getenv('MAGICK_HOME')} );
 
                 
 % Update Matlab toolboxes paths

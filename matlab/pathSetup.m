@@ -10,6 +10,7 @@ global FSLDIR
 global DTITK
 global FREESURFER_HOME SUBJECTS_DIR
 global DICOM2NIIX DICOM2BIDS
+global IMGMAGICK
 global NODDI
 global LONGANPATH
 global DICOMDIR RAWDIR POPANDIR SUBANDIR
@@ -24,6 +25,7 @@ DTITK = '';             % MODIFY !! full path to DTI-TK directory
 FREESURFER_HOME = '';   % MODIFY !! full path to freeSurfer directory
 DICOM2NIIX = '';        % MODIFY !! full path to dcm2niix directory
 DICOM2BIDS = '';        % MODIFY !! full path to dcm2bids directory
+IMGMAGICK = '';         % MODIFY !! full path to IamgeMagick directory
 NODDI = '';             % MODIFY !! full path to NODDI toolbox directory
 LONGANPATH = '';        % MODIFY !! full path to LongAn directory
 

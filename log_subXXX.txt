@@ -20,11 +20,15 @@ pathSetup();
 %%  Write here the ID you would like to assigne to this subject.
 %   This should be consistent with the ID used when renaming this file.
 
-subid = ''; % (MODIFY! e.g.: '001')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MODIFY HERE! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subid = ''; % e.g.: '001' 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Write here the name (not the path) of the DICOM folder containg the data of this subject.
 
-dcm_subid = ''; % (MODIFY! e.g.: 'S01')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MODIFY HERE! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dcm_subid = ''; % e.g.: 'S01'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% ################      SESSION LEVEL ANALYSIS       #####################
 
@@ -32,25 +36,22 @@ dcm_subid = ''; % (MODIFY! e.g.: 'S01')
 %                              ...  time points available for this subject]
 
 %% Session # XX (adapt this to make it consistent with session ID, e.g.: 01)
+config = setSesConfig(); % don't change this
 
-% firts thing, let's define the SESSION ID
-sesid = ''; % (MODIFY! e.g.: '01')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MODIFY HERE! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+sesid = ''; % This is the ID you want to assigne to this session e.g.: '01'
+config.dcm2nii.dcm_sesID = ''; % This is the dcm folder ID of the session e.g.: 's56454'
+config.dcm2nii.configFile = ''; % This is the config fle for this specific session 
+                                %  e.g.: '/Users/<myUsername>/BIDSconfig.json')
+config.parall = []; % Set the number of cores you want to use for parallel computing. leave empty otherwise.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% next, let's do some configurations. No need to change this!
-config = setSesConfig();
+% Let's setup a few things...(don't change this)
 config.sesID = sesid;
 config.dcm2nii.dcm_subID = dcm_subid;
 
-% Now write here the name (not the path) of the DICOM folder containg this specific session data.
-config.dcm2nii.dcm_sesID = ''; % (MODIFY! e.g.: 's56454')
-% Add the PATH to the .json BIDS configuration file for this specifc session
-config.dcm2nii.configFile = ''; % (MODIFY! e.g.: '/Users/<myUsername>/BIDSconfig.json')
-
-% At this point let's start the analysis !!!
+% ...and let's start the analysis !!!
 l = sessionLevelAnalysis(subid, config.sesID, config);
-
-
-
 
 %% ################      SUBHECT LEVEL ANALYSIS       #####################
 

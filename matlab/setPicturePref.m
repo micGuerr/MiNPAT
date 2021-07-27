@@ -1,9 +1,9 @@
-function [frac, intensity, scale] = setPicturePref(fileType)
+function [frac, intensity, scale] = setPicturePref(fileType, fname)
 % 
 % Sets different viewing options for 2D pictures of 3D image volumes.
 %   
 % Usage:
-%   [frac, intensity, scale] = setPicturePref(fileType)
+%   [frac, intensity, scale] = setPicturePref(fileType, fname)
 % 
 % Input:
 %   fileType    string defining the file type. Accteable file types are

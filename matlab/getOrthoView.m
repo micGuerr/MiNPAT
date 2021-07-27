@@ -74,7 +74,7 @@ for ii = 1:3
         % Concatenate the output
         conc_cmd = sprintf('convert %s %s +append %s', tmpfile, outname, outname);
         if v; fprintf('%s\n', conc_cmd); end
-        %system(conc_cmd, '-echo');
+        system(conc_cmd, '-echo');
     end
     % copy the output file 
     cp_cmd = sprintf('cp %s %s', outname, tmpfile);

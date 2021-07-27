@@ -46,20 +46,8 @@ dcm2bids_cmd = [fullfile(DICOM2BIDS,'dcm2bids') ...
 fprintf('===============================================\n');
 fprintf('Converting...\n');
 fprintf('Subject ID: %s\n', subID);
-fprintf('Session ID: %s --> %s\n', tpsFplder(ss).name, sesID);
+fprintf('Session ID: %s\n', sesID);
 fprintf('Final command is:\n\n');
 
 % execte the command from the operating system
 status = runSystemCmd(dcm2bids_cmd,1);
-
-
-
-
-
-
-
-
-
-
-
-

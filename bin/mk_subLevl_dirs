@@ -1,0 +1,139 @@
+#!/bin/bash
+
+# Requirements for this script
+# No requirments are needed
+
+# ---------------------------------------------------------------------------------
+# Usage Description Function
+# ---------------------------------------------------------------------------------
+
+script_name=$(basename "${0}")
+
+Usage() {
+	cat <<EOF
+
+${script_name}: Tool for initializing the folder structure.
+
+Usage: ${script_name}
+  --wrkdir=<working_dir>
+  --subid=<subjID_list>
+  [--sesid=<sesID_list>]
+  [--anat]
+  [--dwi]
+  [--func]
+
+========================
+
+The optional flags "--anat", "--dwi", "--func" specify the folder
+structure should be initialized for that (those) specific streamline(s).
+If not specified all the streamlines are initialized.
+
+EOF
+}
+
+# Allow script to return a Usage statement, before any other output or checking
+if [ "$#" = "0" ]; then
+    Usage
+    exit 1
+fi
+
+################################## SUPPORT FUNCTIONS ###################################################
+
+# funtion for parsing options
+getopt1() {
+	sopt="$1"
+	shift 1
+	for fn in $@; do
+		if [ `echo $fn | grep -- "^${sopt}=" | wc -w` -gt 0 ] ; then
+			echo $fn | sed "s/^${sopt}=//"
+			return 0
+		fi
+	done
+}
+
+# funtion for parsing options
+getopt2() {
+        sopt="$1"
+        shift 1
+        for fn in $@; do
+                if [ `echo $fn | grep -- "^${sopt}" | wc -w` -gt 0 ] ; then
+			echo 1
+                        return 0
+                fi
+        done
+	echo 0
+}
+
+defaultopt() {
+    echo $1
+}
+
+mkMyDir() {
+
+	path="$1"
+	SubjID="$2"
+	SesID="$3"
+
+	SubjDir="$path/sub-$SubID"
+	if [ ! -d $SubjDir ] ; then
+		mkdir -p $SubjDir
+	fi
+
+	if [ ! -z $SesID ] ; then
+		SessDir="$path/sub-$SubID/ses-$SesID"
+	        if [ ! -d $SessDir ] ; then
+                    	mkdir -p  $SessDir
+	        fi
+		targDir=$SessDir
+	else
+		targDir=$SubjDir
+	fi
+
+	return 0
+}
+
+
+################################## OPTIONS PARSING ###################################################
+
+WD=`getopt1 "--wrkdir" $@`  # "$1"
+SubID=`getopt1 "--subid" $@`  # "$2"
+SesID=`getopt1 "--sesid" $@`  # "$3"
+DoStruct=`getopt2 "--anat" $@`  # "$4"
+DoDiff=`getopt2 "--dwi" $@`  # "$5"
+DoFunc=`getopt2 "--func" $@`  # "$6"
+
+
+if [ "$DoStruct" -eq 0 ] &&  [ "$DoDiff" -eq 0 ] &&  [ "$DoFunc" -eq 0 ] ; then
+	DoStruct=1
+	DoDiff=1
+	DoFunc=1
+fi
+
+######################################## DO WORK ###############################################
+
+# Check if the working directory exists, if not create it
+if [ ! -d  $WD ] ; then
+	mkdir -p  $WD
+fi
+
+# Next create the subject and (if required) session folder
+mkMyDir ${WD} ${SubID} ${SesID}
+
+# Define the three streamlines
+StreamL=(anat dwi func)
+DoStream=($DoStruct $DoDiff $DoFunc)
+
+# loop over the streamlines, creat the structure if required
+for i in 0 1 2; do
+
+	# Check whther the stream is required
+	if [ ${DoStream[$i]} -gt 0 ] ; then
+
+		# if so, create the main folder
+		StreamFold=$targDir/${StreamL[$i]}
+		if [ ! -d $StreamFold ] ; then
+			mkdir -p  $StreamFold
+		fi
+	echo ${StreamFold}
+	fi
+done

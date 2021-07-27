@@ -90,8 +90,14 @@ copyfile(pathSetup_source, pathSetup_dest);
 
 %% Automatically update the pathSetup.m file
 
+% Update Neuroplasticity Microstructure analysis toolbox folder path
+plasticity_path = erase(erase(which('dcmConvert'), ...
+                'dcmConvert.m'), 'matlab');
+update_pathSetup(pathSetup_dest, {'LONGANPATH'}, ... 
+                    {fullfile(plasticity_path, 'bin')} );
+
 % Update the analysis folder paths
-update_pathSetup(pathSetup_dest, {'DCMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'}, ... 
+update_pathSetup(pathSetup_dest, {'DICOMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'}, ... 
                     {dicomData_path, rawdat, popan, suban} );
                 
 % Update the external softares paths if correctly configured on this system

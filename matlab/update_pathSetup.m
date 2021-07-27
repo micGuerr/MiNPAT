@@ -14,7 +14,7 @@ function update_pathSetup(filePath, fields, paths)
 %   Update the file
 % 
 % Author:
-%   Michele Guerreri (m.guerreri@ucl.ac.uk)]
+%   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
 %% Check the stage and paths have same length
 

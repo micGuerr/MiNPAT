@@ -26,6 +26,8 @@ function takeVolShot(filename, view, fraction, intensity, scale, outname)
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
+global FSLDIR
+
 %% CHECKS AND INITIALIZATIONS
 
 % Check that the file exists
@@ -58,16 +60,14 @@ end
 %% REAL JOB
 
 % Define FSL's slicer command
-slicer_cmd = ['slicer ' filename, ...
+slicer_cmd = [fullfile(FSLDIR, 'bin', 'slicer ') filename, ...
                 I, ...
                 S, ...
                 sprintf(' -%s %.2f ', view, fraction) ...
                 outname];
-% Print it to command window            
-fprintf('%s\n', slicer_cmd);
 
 % Run the command
-%system(slicer_cmd, '-echo');
+runSystemCmd(slicer_cmd, 1);
 
 
 

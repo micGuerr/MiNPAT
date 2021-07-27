@@ -78,14 +78,12 @@ for ii = 1:3
     end
     % copy the output file 
     cp_cmd = sprintf('cp %s %s', outname, tmpfile);
-    if v; fprintf('%s\n', cp_cmd); end
-    %system(cp_cmd, '-echo');
+    runSystemCmd(cp_cmd, v);
 end
 
 % Remove the temporary file
 rm_cmd = sprintf('rm %s', tmpfile);
-if v; fprintf('%s\n', rm_cmd); end
-%system(rm_cmd, '-echo');
+runSystemCmd(rm_cmd, v);
 
 
 

@@ -1,10 +1,10 @@
-function [anatPath, status] = define_sesLevl_path(subLevl_dir, subID, sesID, stream)
+function [stramPath, status] = define_sesLevl_path(subLevl_dir, subID, sesID, stream)
 % 
 % Defines the folder structure of a spcific subject and sesison for 
 % session level analysis.
 % 
 % Usage:
-%   [anatPath, status] = define_sesLevl_path(subLevl_dir, subID, sesID, stream)
+%   [stramPath, status] = define_sesLevl_path(subLevl_dir, subID, sesID, stream)
 % 
 % Inputs:
 %   subLevl_dir 
@@ -13,6 +13,7 @@ function [anatPath, status] = define_sesLevl_path(subLevl_dir, subID, sesID, str
 %   stream
 % 
 % Output:
+%   stramPath
 %   status
 % 
 % Author:
@@ -32,4 +33,6 @@ else
         ' --' stream];
 end
 % Run the command
-[status, anatPath] = runSystemCmd(mkdir_cmd, 1 );
+[status, result] = runSystemCmd(mkdir_cmd, 1 );
+% Remove the "new-line" from the output path
+stramPath = result(1:end-1);

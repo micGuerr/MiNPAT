@@ -36,11 +36,12 @@ Usage: ${script_name}
 		Check https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Orientation%20Explained
 		for more info.
 
---out:		Specify the folder and ouput basename. If not specified the output
+--out:		Specify the folder and ouput name. If not specified the output
 		will be saved in the current directory. The unbiased volume will 
 		be named  <invol>_unbias.
 
---outT2w:	Specify the folder in which to store T2w results. Only use in combination with --t2w flag
+--outT2w:	Specify the folder and ouput name of T2w bias correction.
+		Only use in combination with --t2w flag
 
 --noBet		The input image has already brain extracted or you want to perform the bias correction 
 		with the brain.
@@ -242,17 +243,20 @@ fi
 echo "Running Bias field correction" | tee -a $logFile
 echo "Input: ${VolIn}" | tee -a $logFile
 echo "Output directory: ${OutDir}" | tee -a $logFile
-echo " " | tee -a $logFile
 
 if [ ! $DoN4 -eq 0 ] ; then
 
 	#### Bias field correction using N4 method ####
+	echo " " | tee -a $logFile
 	echo "N4 method selected: " | tee -a $logFile
 
 	echo "N4BiasFieldCorrection -d 3 -i $VolIn -o $OutVol"
 elif [ ! -z $T2wVolIn ] ; then
-
+	
+	echo "T2w Input: ${T2wVolIn}" | tee -a $logFile
+	echo "T2w Output directory: ${OutT2wDir}" | tee -a $logFile
 	#### Bias field correction using T2w image ####
+	echo " " | tee -a $logFile
 	echo "Correction via T2w image: " | tee -a $logFile
 	
 	## First step: Brain extraction via gross bias correction for T1w and T2w
@@ -273,6 +277,9 @@ elif [ ! -z $T2wVolIn ] ; then
 	fslmaths $VolIn -mas $T1wBrain_mask $T1wBrain
 	fslmaths $T2wVolIn -mas $T2wBrain_mask $T2wBrain
 
+	# Second step: register T1w and T2w images
+	echo "Part Two - T2w to T1w registration." | tee -a $logFile
+	echo "------------------------------------------------------------" | tee -a $logFile
 	# Create folder for T2w to T1w registration file storing
 	T2w2T1wRegDir="${OutT2wDir}/T2w2T1wReg"
 	if [ ! -d $T2w2T1wRegDir ] ; then mkdir $T2w2T1wRegDir ; fi
@@ -283,6 +290,9 @@ elif [ ! -z $T2wVolIn ] ; then
 	# Apply the registration
 	applywarp --rel --interp=spline --in=${T2wVolIn} --ref=${VolIn} --premat=${T2w2T1w}.mat --out=${T2w2T1w} -v
 	
+	# Third step: compute bias field estimation
+	echo "Part Three - Estimate of the bias field." | tee -a $logFile
+	echo "------------------------------------------------------------" | tee -a $logFile
 	# Compute Y = sqrt( |T1w * phi(T2w)|) where phi(.) is the transformation from T2w to T1w space
 	T1wXT2w="${OutTmpDir}/${InPrefx}_sqrtT1wT2w"
 	fslmaths ${VolIn} -mul ${T2w2T1w} -abs -sqrt ${T1wXT2w} -odt float
@@ -305,7 +315,7 @@ elif [ ! -z $T2wVolIn ] ; then
 	# Compute k=Mean(Z) - std(Z)/2.k is used to isolate values far from the mean in the negartive direction
 	S=`fslstats ${T1wXT2w}_brain_norm_modulate -S`
 	M2=`fslstats ${T1wXT2w}_brain_norm_modulate -M`
-	low=$(python -c "print ${M2} - ${S}*0.5")
+	low=$(python2 -c "print ${M2} - ${S}*0.5")
 	
 	# threshold Z with k, then bin, ero, *255. Fill also the holes
 	fslmaths ${T1wXT2w}_brain_norm_modulate -thr ${low} -bin -ero -mul 255 ${T1wXT2w}_brain_norm_modulate_mask
@@ -318,13 +328,16 @@ elif [ ! -z $T2wVolIn ] ; then
 	Biasfield=${OutTmpDir}/${InPrefx}_biasfield_final
 	fslmaths ${RawBias} -s 5 ${Biasfield}
 	
-	# Copute the restored versions of T1w and T2w images using the bias field estimation
+	# Last step: the restored versions of T1w and T2w images using the bias field estimation
+	echo "Part Four - Get the bias field corrected images." | tee -a $logFile
+	echo "------------------------------------------------------------" | tee -a $logFile
 	fslmaths ${VolIn} -div ${Biasfield} ${OutVol} -odt float
 	fslmaths ${T2wVolIn} -div ${Biasfield} ${T2wOutVol} -odt float
 	
 else
 
 	#### Bias field correction using fsl_anat approach ####
+	echo " " | tee -a $logFile
 	echo "FAST based correction method: " | tee -a $logFile
 	echo " " | tee -a $logFile
 	
@@ -353,7 +366,7 @@ else
 	echo "***FAST 2-nd instance ****" | tee -a $logFile
 	fast -o ${initfast2} -l ${smooth} -b -B -t $type --iter=${niter} --nopve --fixed=0 -v ${initfast_out} >> $logFile
 	
-	## Second step: more accurate bias correction via FLIRT
+	## Third step: a final FAST run
 	echo "Part Three - final correction." | tee -a $logFile
 	echo "---------------------------------" | tee -a $logFile
 	# outputs
@@ -375,7 +388,11 @@ else
 	fslmaths ${biasEstimation} -add 1 ${biasEstimation} 
     	fslmaths ${fast_total_bias} -add 1 ${fast_total_bias} 
     	#fslmaths $totbias -sub 1 -mas $mask_ero -dilall -add 1 (shouldn't be 2 ?!) $biasEstimation  # alternative to fslsmoothfill
-    	fslmaths ${VolIn} -div ${biasEstimation} ${OutVol}
+    	
+	## Last step: a final FAST run
+	echo "Part Four - Get the bias field corrected image." | tee -a $logFile
+	echo "---------------------------------" | tee -a $logFile	
+	fslmaths ${VolIn} -div ${biasEstimation} ${OutVol}
 
 	## An alternative to "Extrapolating bias field from central region" step could be the following:
 	#fslmaths ${VolIn} -div ${fast_out} -mas ${InVol_hpf_brain} -sub 1 ${fast_total_bias}

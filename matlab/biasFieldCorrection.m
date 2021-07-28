@@ -40,31 +40,43 @@ end
 bfcData = struct();
 
 [t1w_path, t1w_name] = niftiFileParts(biasedData.t1w);
-bfcData.t1w = fullfile(t1w_path, sprintf('%s_bfc', t1w_name));
+bfcData.t1w = fullfile(t1w_path, sprintf('%s_bfc.nii.gz', t1w_name));
 
-%% Define snd run the command. This depends on whether there is or not the T2w image
+%% Define and run the command. This depends on whether there is or not the T2w image
 
-if ~t2w
-    % Define the output for t2w
-    [t2w_path, t2w_name] = niftiFileParts(biasedData.t2w);
-    bfcData.t2w = fullfile(t2w_path, sprintf('%s_bfc', t2w_name));
+% Check 
+if ~exist(bfcData.t1w, 'file')
+    if t2w
+        % Define the output for t2w
+        [t2w_path, t2w_name] = niftiFileParts(biasedData.t2w);
+        bfcData.t2w = fullfile(t2w_path, sprintf('%s_bfc.nii.gz', t2w_name));
 
-    % define the command
-    bfc_cmd = ['biasField_rm --in=' biasedData.t1w, ...
-                           ' --t2w=' biasedData.t2w, ...
-                           ' --out=' bfcData.t1w, ...
-                           ' --outT2w' bfcData.t2w, ...
-                           ' --noReorient'];
-    
-    % run the bfc
-    status = runSystemCmd(bfc_cmd, 1); 
+        % define the command
+        bfc_cmd = ['biasField_rm --in=' biasedData.t1w, ...
+                               ' --t2w=' biasedData.t2w, ...
+                               ' --out=' bfcData.t1w, ...
+                               ' --outT2w=' bfcData.t2w, ...
+                               ' --noReorient'];
+
+        % run the bfc
+        status = runSystemCmd(bfc_cmd, 1); 
+    else
+        % define the command
+        bfc_cmd = ['biasField_rm --in=' biasedData.t1w, ...
+                               ' --out=' bfcData.t1w, ...
+                               ' --noReorient'];
+
+        % run the bfc
+        status = runSystemCmd(bfc_cmd, 1); 
+    end
 else
-    % define the command
-    bfc_cmd = ['biasField_rm --in=' biasedData.t1w, ...
-                           ' --out=' bfcData.t1w, ...
-                           ' --noReorient'];
-    
-    % run the bfc
-    status = runSystemCmd(bfc_cmd, 1); 
-
+    % need to return the t2w output name anyway
+    if t2w
+        % Define the output for t2w
+        [t2w_path, t2w_name] = niftiFileParts(biasedData.t2w);
+        bfcData.t2w = fullfile(t2w_path, sprintf('%s_bfc.nii.gz', t2w_name));
+    end
+    warning('file %s already exist. If you want to carry on with the analysis, consider change name of already existing file or remove it.', ...
+        bfcData.t1w);
+    status = 2;
 end

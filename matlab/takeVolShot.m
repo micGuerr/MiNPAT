@@ -1,10 +1,10 @@
-function takeVolShot(filename, view, fraction, intensity, scale, outname)
+function takeVolShot(filename, view, fraction, intensity, scale, sliceN, outname)
 % 
 % Get a shot of a slice of the spcified volume. The output is saved as a 
 % ".png" file.
 % 
 % Usage:
-%   takeVolShot(filename, view, fraction, intensity, scale, outname)
+%   takeVolShot(filename, view, fraction, intensity, scale, sliceN, outname)
 % 
 % Inputs:
 %   filename    Input volume filename (string).
@@ -15,6 +15,7 @@ function takeVolShot(filename, view, fraction, intensity, scale, outname)
 %               [min max]. If empty, the range is automatically specified.
 %   scale       Chenge the scale of the image. It should be an integer.
 %               If, empty the scale is automatically set.
+%   sliceN      Add slice number to the shot
 %   outname     Output name (string).
 % 
 % Output:
@@ -49,6 +50,13 @@ else
     S = [];
 end
 
+% Check is slice number should be inserted
+if sliceN
+    L = ' -l ';
+else
+    L = [];
+end
+
 % Check that output file name extension is right. It needs to be specified.
 [outpath, outroot, outext] = fileparts(outname);
 if  isempty(outext)
@@ -61,6 +69,7 @@ end
 
 % Define FSL's slicer command
 slicer_cmd = [fullfile(FSLDIR, 'bin', 'slicer ') filename, ...
+                L, ...
                 I, ...
                 S, ...
                 sprintf(' -%s %.2f ', view, fraction) ...

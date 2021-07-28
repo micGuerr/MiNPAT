@@ -87,10 +87,11 @@ for ii = 1:length(idx)
             end
             % Check whether the linking process gave positive results
             % DOESN't work!
-            if ~l && ~l_sc
-                error('Something went wrong when creating the link of strcutral data %s', ...
-                    vol_fullPath);
-            end
+            status = 0;
+%             if ~l && ~l_sc
+%                 error('Something went wrong when creating the link of strcutral data %s', ...
+%                     vol_fullPath);
+%             end
         end
     end 
 end

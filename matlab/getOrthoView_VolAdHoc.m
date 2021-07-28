@@ -38,15 +38,11 @@ function getOrthoView_VolAdHoc(filename)
 %% Set up things
 
 % Get parts of the input
-[fpath, fname] = fileparts(filename);
-% usually inputs should be gzipped, then ...
-if contains(fname, '.nii')
-    [~, fname] = fileparts(fname);
-end
+[fpath, fname] = niftiFileParts(filename);
 
 % Try to get the file type as the string after last underscore
-unds = strfind(fname, '_');
-ftype = fname( unds(end)+1 : end );
+fsplits = split(fname, '_');
+ftype = fsplits{end};
 
 % Define output name
 outname = fullfile(fpath, sprintf('%s.png', fname));

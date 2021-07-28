@@ -14,16 +14,18 @@ global LONGANPATH
 %% BASH PATHS CONFIGURATION
 
 % LONGAN configuration
-setenv('PATH', [getenv('PATH') ':' LONGANPATH]);
+setenv('LONGAN_ROOT', LONGANPATH);
+setenv('PATH', [ fullfile(getenv('LONGAN_ROOT'),'bin') ':' getenv('PATH')]);
+runSystemCmd(sprintf('chmod +x %s', fullfile(getenv('LONGAN_ROOT'),'bin' ,'*')), 0);
 
 % FSL configuration
 setenv('FSLDIR', FSLDIR);
 
 % DTITK configuration
 setenv('DTITK_ROOT', DTITK);
-setenv('PATH', [getenv('PATH') ':' fullfile(getenv('DTITK_ROOT'),'bin')]);
-setenv('PATH', [getenv('PATH') ':' fullfile(getenv('DTITK_ROOT'),'utilities')]);
-setenv('PATH', [getenv('PATH') ':' fullfile(getenv('DTITK_ROOT'),'scripts')]);
+setenv('PATH', [ fullfile(getenv('DTITK_ROOT'),'bin') ':'  getenv('PATH') ]);
+setenv('PATH', [ fullfile(getenv('DTITK_ROOT'),'utilities') ':'  getenv('PATH') ]);
+setenv('PATH', [ fullfile(getenv('DTITK_ROOT'),'scripts') ':'  getenv('PATH') ]);
 
 % FreeSurfer configuration
 setenv('FREESURFER_HOME', FREESURFER_HOME);
@@ -31,14 +33,14 @@ system('source ${FREESURFER_HOME}/SetUpFreeSurfer.sh');
 setenv('SUBJECTS_DIR', SUBJECTS_DIR);
 
 % dicom2niix configuration
-setenv('PATH', [getenv('PATH') ':' DICOM2NIIX]);
+setenv('PATH', [ DICOM2NIIX ':'  getenv('PATH') ]);
 % dicom2bids configuration
-setenv('PATH', [getenv('PATH') ':' DICOM2BIDS]);
+setenv('PATH', [ DICOM2BIDS ':'  getenv('PATH') ]);
 
 % ImageMagick configuration
 setenv('MAGICK_HOME', IMGMAGICK);
-setenv('PATH', [getenv('PATH') ':' fullfile(getenv('MAGICK_HOME'),'bin')]);
-setenv('DYLD_LIBRARY_PATH', [getenv('DYLD_LIBRARY_PATH') ':' fullfile(getenv('MAGICK_HOME'),'lib')]);
+setenv('PATH', [ fullfile(getenv('MAGICK_HOME'),'bin') ':'  getenv('PATH') ]);
+setenv('DYLD_LIBRARY_PATH', [ fullfile(getenv('MAGICK_HOME'),'lib') ':' getenv('DYLD_LIBRARY_PATH') ]);
 
 %% MATLAB PATHS CONFIGURATION
 

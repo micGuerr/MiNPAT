@@ -22,7 +22,7 @@ function status = sessionLevelAnalysis(subID, sesID, config)
 
 %% Call the GLOBAL variables
 
-global DICOMDIR RAWDIR SUBANDIR
+global DICOMDIR RAWDIR SUBANDIR SUBJECTS_DIR
 
 
 %% STEP 0.      DICOM TO NIfTI CONVERSION
@@ -67,10 +67,11 @@ config.anat.input = getSesLevelAnalysisInput(RAWDIR, config.dcm2nii.expFileList,
 %% Step 1.3     FreeSurfer (FS) analysis
 
 % Define the ID to use in the FS analysis
-config.anat.fs.ID = [subID '_' sesID];
+config.anat.fs.ID = sprintf('sub-%s_ses-%s', subID, sesID);
 % Run the FreeSurfer analysis
 config.anat.fs.outc = runFreeSufer(config.anat.bfc.outp, ...
-                        config.anat.fs.ID, config.parall);
+                        SUBJECTS_DIR, config.anat.fs.ID, ...
+                            config.parall);
     
 %% Step 1.4     Anatomical brain mask definition
 

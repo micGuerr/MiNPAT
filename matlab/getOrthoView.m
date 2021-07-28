@@ -52,37 +52,26 @@ elseif ~strcmp(outext, '.png')
     warning('File extension "%s" not accepted. File extension automatically set to "png".', outext)
 end
 
-% Define a temporary filename. Check whether it already exist.
-tmpfile = fullfile(outpath, sprintf('tmpSlicer_%s.png', date));
-if isfile(tmpfile)
-    warning('A file named %s, already exist. Rename it or delate it in order to proceed.', tmpfile);
-    return
-end
-
 % Define the three views
 views = {'x', 'y', 'z'};
 viewNames = {'Sagittal', 'Coronal', 'Axial'};
-
+concat_input = [];
 %% REAL JOB
 
 % Loop over the three views
 for ii = 1:3
     % Take the single slice shot
     if v; fprintf('Taking %s slice shot...\n', viewNames{ii}); end
-    takeVolShot(filename, views{ii}, frac(ii), intensity, scale, outname)
-    if ii > 1
-        % Concatenate the output
-        conc_cmd = sprintf('convert %s %s +append %s', tmpfile, outname, outname);
-        if v; fprintf('%s\n', conc_cmd); end
-        system(conc_cmd, '-echo');
-    end
-    % copy the output file 
-    cp_cmd = sprintf('cp %s %s', outname, tmpfile);
-    runSystemCmd(cp_cmd, v);
+    tmpName = fullfile(outpath, sprintf('tmpSlicer_%s_%s.png', viewNames{ii}, date));
+    takeVolShot(filename, views{ii}, frac(ii), intensity, scale, 1, tmpName)
+    concat_input = [tmpName ' '];
 end
 
+conc_cmd = sprintf('h_concat %s %s', outname, concat_input);
+runSystemCmd(conc_cmd, v);
+
 % Remove the temporary file
-rm_cmd = sprintf('rm %s', tmpfile);
+rm_cmd = sprintf('rm %s', fullfile(outpath, sprintf('tmpSlicer_*_%s.png', date)));
 runSystemCmd(rm_cmd, v);
 
 

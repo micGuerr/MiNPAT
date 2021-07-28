@@ -94,7 +94,7 @@ copyfile(pathSetup_source, pathSetup_dest);
 plasticity_path = erase(erase(which('dcmConvert'), ...
                 'dcmConvert.m'), 'matlab');
 update_pathSetup(pathSetup_dest, {'LONGANPATH'}, ... 
-                    {fullfile(plasticity_path, 'bin')} );
+                    {plasticity_path} );
 
 % Update the analysis folder paths
 update_pathSetup(pathSetup_dest, {'DICOMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'}, ... 
@@ -118,9 +118,8 @@ update_pathSetup(pathSetup_dest, {'NODDI'}, ...
 if ~isempty(dcm2niix_path) && ~niixStatus; dcm2niix_path = erase( dcm2niix_path,'dcm2niix'); end
 if ~isempty(dcm2bids_path) && ~bidsStatus; dcm2bids_path = erase( dcm2bids_path,'dcm2bids'); end
 
-update_pathSetup(pathSetup_dest, {'DCM2NIIX', 'DCM2BIDS'}, ... 
-                    {dcm2niix_path, dcm2bids_path} );
-
+update_pathSetup(pathSetup_dest, {'DICOM2NIIX', 'DICOM2BIDS'}, ...
+                    {dcm2niix_path(1:end-1), dcm2bids_path(1:end-1)} );
 
 %% Add the processing folder to the matlab path
 

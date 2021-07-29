@@ -1,4 +1,4 @@
-function [l, fList] = qcCheckFileList(wrkDir, subID, sesID, configFile, varargin)
+function [l, fList] = qcCheckFileList(wrkDir, subID, sesID, configFile, excludConf)
 % 
 % Check consistency between dcm2bids output and expectation based on the
 % configuration file. Also, check if there are files in the 
@@ -53,13 +53,13 @@ qcTxt = fullfile(fullPath, qcTxt_name);
 %% REAL JOB
 
 % Get the expected file list based on the configuration file
-expList = getExpectedFileList(configFile, subID, sesID, varargin{:});
+expList = getExpectedFileList(configFile, subID, sesID);
 
 % Do check list
 [fList, c1] = doCheckList(expList, wrkDir, subID, sesID);
 
 % Check also the files into the tmp_dcm2bids folder
-[tmpList, c2] = doTmpCheckList(wrkDir, subID, sesID,'localizer');
+[tmpList, c2] = doTmpCheckList(wrkDir, subID, sesID, excludConf);
 
 % Write the file
 getRawDataQCtxt(qcTxt, c1, fList, c2, tmpList, wrkDir, subID, sesID, configFile);

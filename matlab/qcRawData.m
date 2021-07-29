@@ -1,4 +1,4 @@
-function l = qcRawData(wrkDir, subID, sesID, configFile, varargin)
+function l = qcRawData(wrkDir, subID, sesID, configFile, excludConf)
 % 
 % Help performing quality check of raw data.
 %
@@ -52,7 +52,7 @@ function l = qcRawData(wrkDir, subID, sesID, configFile, varargin)
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
 % Performs QC of the files
-[l, fList] = qcCheckFileList(wrkDir, subID, sesID, configFile, varargin{:});
+[l, fList] = qcCheckFileList(wrkDir, subID, sesID, configFile, excludConf);
 
 if l
     % Take volume shots

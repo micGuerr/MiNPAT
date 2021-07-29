@@ -12,7 +12,7 @@ script_name=$(basename "${0}")
 Usage() {
 	cat <<EOF
 
-${script_name}: Saves to lateral shots of the input surface and overlay
+${script_name}: Saves two lateral shots of the input surface and overlay
 
 Usage:
 ${script_name} --flag=<flag_value>
@@ -26,11 +26,14 @@ Compulsory arguments (You MUST set one or more of):
 
 Optional arguments (You may optionally specify one or more of):
 
-	--m	Minimum overlat threshold value.
-	--M	Maximuim overlat threshold value.
+	--cl 	surf color
+	--crv 	curvature_method
+	--m	Minimum overlay threshold value.
+	--M	Maximuim overlay threshold value.
 	--cs	Plot color scale
-
-
+	--op 	Overalay opacity [0 1]
+	--mthd 	Overlay method
+	
 
 EOF
 }
@@ -86,10 +89,14 @@ defaultopt() {
 
 SurfIn=`getopt1 "--ins" $@`  # "$1"
 OverIn=`getopt1 "--ino" $@`  # "$2"
-Out=`getopt1 "--out" $@`  # "$4"
+Out=`getopt1 "--out" $@`  # "$3"
+color=`getopt1 "--cl" $@`  # "$4"
+crv=`getopt1 "--crv" $@`  # "$5"
 m=`getopt1 "--m" $@`  # "$5"
 M=`getopt1 "--M" $@`  # "$6"
-cs=`getopt2 "--cs" $@`  # "$6"
+cs=`getopt2 "--cs" $@`  # "$7"
+op=`getopt1 "--op" $@`  # "$8"
+mthd=`getopt1 "--mthd" $@`  # "$9"
 
 # Check compulsory inputs
 
@@ -110,21 +117,41 @@ fi
 ######################################## DO WORK ###############################################
 
 # Define the basic command
+cmd="freeview -f  ${SurfIn}"
 
-cmd="freeview -f  ${SurfIn}:overlay=${OverIn}"
+# add the color if required
+if [ ! -z $color ] ; then
+	cmd=" ${cmd}:color=$color"
+fi
+
+# add curvature method
+if [ ! -z $crv ] ; then
+        cmd=" ${cmd}:curvature_method=$crv"
+fi
+
+# add the overlay
+cmd="${cmd}:overlay=${OverIn}"
 
 # add the threshold if needed
-
 if [ ! -z $m ] && [ ! -z $M ]  ; then
 	cmd=" ${cmd}:overlay_threshold=${m},${M}"
-else
+elif [ ! -z $m ] || [ ! -z $M ]  ; then
 	echo "ERROR: to use threshold, both --m and --M flags must be set!"
 fi
 
-# add the color scale
+# Make overlay opaque
+if [ ! -z $op ] ; then
+	cmd=" ${cmd}:overlay_opacity=$op"
+fi
 
+# change overlay mathod
+if [ ! -z $mthd ] ; then
+        cmd=" ${cmd}:overlay_method=$mthd"
+fi
+
+# add the color scale
 if [ ! -z $cs ] ; then
-	cmd=" ${cmd}:overlay_threshold=${m},${M} -colorscale"
+	cmd=" ${cmd} -colorscale"
 fi
 
 

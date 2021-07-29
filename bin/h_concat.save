@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+# Import
+import cv2
+import os
+import sys
+
+HELPTEXT = """
+Horizontally concatenate multiple images
+
+USAGE:
+    python3 h_concat  <output_img> <input_img_1> <input_img_2> ... <input_img_N>
+
+DEPENDENCIES:
+    OpenCV (cv2)
+    os
+
+Original author:
+    Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+DATE:
+    28/07/2021
+"""
+
+if __name__ == "__main__":
+	# If there are no inputs print the help and exit
+	if len(sys.argv) == 1:
+		print(HELPTEXT)
+		quit()
+	elif len(sys.argv) < 3:
+		print('ERROR:')
+		print('At least two images and an output name should be input !!\n')
+		print(HELPTEXT)
+		quit()
+
+	# The first input is always the output name
+	output=sys.argv[1]
+	inputs=sys.argv[2:]
+
+	for i in range(len(inputs)-1):
+		print(inputs[i])
+		print(inputs[i+1])
+		#img1 = cv2.imread()
+	#print('Number of arguments:', len(sys.argv), 'arguments.')
+	#print('Argument List:', str(sys.argv))
+

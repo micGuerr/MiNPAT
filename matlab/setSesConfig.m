@@ -30,6 +30,7 @@ config.dcm2nii = [];
 config.dcm2nii.dcm_subID = [];
 config.dcm2nii.dcm_sesID = [];
 config.dcm2nii.configFile = [];
+config.dcm2nii.configFile.excl = [];
 
 % outputs
 config.dcm2nii.expFileList = [];
@@ -66,7 +67,8 @@ config.dwi.path = [];
 config.dwi.input = [];
 
 % step 2.1 topup
-config.dwi.topup.outpath = [];
+config.dwi.topup.cnfg = [];
+config.dwi.topup.bsname = [];
 config.dwi.topup.field = [];
 config.dwi.topup.b0unwrp = [];
 config.dwi.topup.outc = [];
@@ -78,6 +80,7 @@ config.dwi.bet.mask = [];
 config.dwi.bet.outc = [];
 
 % step 2.3 eddy
+config.dwi.eddy.bsname = [];
 config.dwi.eddy.outp = [];
 config.dwi.eddy.outc = [];
 

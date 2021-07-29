@@ -13,84 +13,120 @@ function [I, status] = getDwiAnalysisInput(rawDataDir, fileList, wrkDirPath, sub
 %   fileList    cell array with list of files expected to be in the RAWDATA
 %               folder of the specific sessison of this subject.
 %               Expected as relative paths from the RAWDATA folder
-%   wrkDirPath  Path to dwi branch of the session level analysis
+%   wrkDirPath  Path to diffusion branch of the session level analysis
 %               folder of this subject and sesison.
 %   subID       Subject ID
 %   sesID       Session ID
 %
 % Outputs:
 %   I           a structure with as many fields as the inputs relevant for
-%               the dwi analysis stream.
+%               the diffusion analysis stream.
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
-%% First thing, check if there is any file into the "anat" folder
+%% First thing, check if there is any diffusion file into the file list
+
+% Define the path to the rawData diffusion folder
 if isempty(sesID)
-    anatPath = fullfile( sprintf('sub-%s', subID), ...
+    dwiPath = fullfile( sprintf('sub-%s', subID), ...
         'dwi');
 else
-    anatPath = fullfile( sprintf('sub-%s', subID), ...
+    dwiPath = fullfile( sprintf('sub-%s', subID), ...
         sprintf('ses-%s', sesID), ...
         'dwi');
 end
 
 % Indices of the cells containing anatomical data
-idx = find(contains(fileList, anatPath));
+idx = find(contains(fileList, dwiPath));
 
-% If idx is emptu it means no anatomical data are available, hence skip
+% If idx is empty it means no diffusion data are available, hence skip
 % analysis
 if isempty(idx)
     I = [];
-    fprintf('No dwi data found');
+    fprintf('No diffusion data found');
     return
 end
 
-%% Now check the inputs
+%% Now store the files as diffusion analysis input and create a soft-link 
+%  to the session level analysis folder
 
-% supported dwi MR image types include at the moment:
-dwi_typ = {'dwi'};
+% supported diffusion MR image types currently include:
+strct_typ = {'dwi'};
 
-% loop over dwi files in the file list
-for ii = 1:length(idx)
-    % use json to track presence of sidecar files
-    json = 0; % initialize to zero
+% loop over diffusion files in the file list
+for ii = 1:length(idx)    
+    %% Need to extract the file type from the file name. Also look for sideCar files
     % take the filename
     vol = fileList{idx(ii)};
     % divide file in parts ...
     [vol_path, vol_name, vol_ext] = niftiFileParts(vol);
     % ... define the volume full path
     vol_fullPath = fullfile(rawDataDir, vol);
-    % check if there is sidecar file
+    
+    % bvalues, bvecs and sideCar (json) files must be included with same dwi image base name
+    vol_bval = fullfile(rawDataDir, vol_path, [vol_name '.bval']);
+    vol_bvec = fullfile(rawDataDir, vol_path, [vol_name '.bvec']);
     vol_sc = fullfile(rawDataDir, vol_path, [vol_name '.json']);
-    if exist(vol_sc, 'file'); json = 1; end
+    % check if they exist
+    if ~exist(vol_bval, 'file') || ~exist(vol_bvec, 'file') || ~exist(vol_sc, 'file')
+        error('b-value, b-vector or sideCar files are missing for file %s', ...
+            vol_fullPath);
+    end
     % split volume name based on "_", output is a cell array
     vol_namePart = split(vol_name, '_');
-    %% use last bit to define volume type, compare with supported dwi
-    % image types
-    for jj = 1:length(dwi_typ)
+    
+    %% Compare file type with supported file types. If OK creat link and store the path
+    for jj = 1:length(strct_typ)
         % check if the file matches any of the structural types
-        if strcmpi(vol_namePart{end}, dwi_typ{jj})
-            % define the input directory for anatomical analysis
-            outdir = fullfile(wrkDirPath, dwi_typ{jj});
+        if strcmpi(vol_namePart{end}, strct_typ{jj})
+            
+            % Define the directory for session level anatomical analysis
+            dwiDir = fullfile(wrkDirPath, strct_typ{jj});
             % create the directory if necessary
-            if ~exist(outdir, 'dir'); mkdir(outdir); end
-            % Define the input for the analysis
-            I.(dwi_typ{jj}) = fullfile(outdir, [vol_name, vol_ext]);
-            % Instead of copying the file, to save space, create a link 
-            ln_cmd = sprintf('ln -s %s %s', vol_fullPath, I.(dwi_typ{jj}));
-            l = runSystemCmd(ln_cmd, 0);
-            % do somethingsimilar if the sidecar file exists
-            if json
-                I.([dwi_typ{jj} '_sc']) = fullfile(outdir, [vol_name, '.json']);
-                ln_sc_cmd = sprintf('ln -s %s %s', vol_sc, I.([dwi_typ{jj} '_sc']));
-                l_sc = runSystemCmd(ln_sc_cmd, 0);
+            if ~exist(dwiDir, 'dir'); mkdir(dwiDir); end
+            
+            % Define the input for the ses level anatomical analysis
+            dwiVol = fullfile(dwiDir, [vol_name, vol_ext]);
+            dwiBval = fullfile(dwiDir, [vol_name, '.bval']);
+            dwiBvec = fullfile(dwiDir, [vol_name, '.bvec']);
+            dwiSc = fullfile(dwiDir, [vol_name, '.json']);
+
+            % Instead of copying the file, to save space, create a link
+            % But first check if the file already exist
+            if ~exist(dwiVol, 'file') && ~exist(dwiBval, 'file') ...
+                    && ~exist(dwiBvec, 'file') && ~exist(dwiSc, 'file')
+                % link the diffusion data
+                ln_cmd1 = sprintf('ln -s %s %s', vol_fullPath, dwiVol);
+                st1 = runSystemCmd(ln_cmd1, 0);
+                % link the bvalues 
+                ln_cmd2 = sprintf('ln -s %s %s', vol_bval, dwiBval);
+                st2 = runSystemCmd(ln_cmd2, 0);
+                % link the bvecs
+                ln_cmd3 = sprintf('ln -s %s %s', vol_bvec, dwiBvec);
+                st3 = runSystemCmd(ln_cmd3, 0);
+                % link the sidecar file
+                ln_cmd4 = sprintf('ln -s %s %s', vol_sc, dwiSc);
+                st4 = runSystemCmd(ln_cmd4, 0);
+                % final status
+                status = ~(~st1 * ~st2 * ~st3 * ~st4);
+            else
+                warning('The diffusion data, b-values, bvecs or sideCar file referred to input %s, already exist', ...
+                    dwiVol);
+                status = 0;
             end
+            
+            % Define this specific acquisition field ID
+            acqID = sprintf('acq%01d', ii);
+            % Assigne the value to the output structue
+            I.(acqID).vol = dwiVol;
+            I.(acqID).bval = dwiBval;
+            I.(acqID).bvec = dwiBvec;
+            I.(acqID).sc = dwiSc;
+                        
             % Check whether the linking process gave positive results
-            % DOESN't work!
-            if ~l && ~l_sc
-                error('Something went wrong when creating the link of strcutral data %s', ...
-                    vol_fullPath);
-            end
+             if ~status_sc
+                 status = status_qc;
+             end
         end
     end 
 end

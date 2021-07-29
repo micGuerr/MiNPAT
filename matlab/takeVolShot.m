@@ -52,7 +52,7 @@ end
 
 % Check is slice number should be inserted
 if sliceN
-    L = ' -l ';
+    L = ' -L ';
 else
     L = [];
 end

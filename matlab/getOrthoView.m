@@ -64,7 +64,7 @@ for ii = 1:3
     if v; fprintf('Taking %s slice shot...\n', viewNames{ii}); end
     tmpName = fullfile(outpath, sprintf('tmpSlicer_%s_%s.png', viewNames{ii}, date));
     takeVolShot(filename, views{ii}, frac(ii), intensity, scale, 1, tmpName)
-    concat_input = [tmpName ' '];
+    concat_input = [concat_input ' ' tmpName];
 end
 
 conc_cmd = sprintf('h_concat %s %s', outname, concat_input);

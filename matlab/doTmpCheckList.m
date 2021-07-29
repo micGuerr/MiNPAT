@@ -1,4 +1,4 @@
-function [fList,check] = doTmpCheckList(wrkDir, subID, sesID, varargin)
+function [fList,check] = doTmpCheckList(wrkDir, subID, sesID, fOmit)
 % 
 % Determines whether the files expectd from a configuration file are all
 % present in a specific folder.
@@ -28,11 +28,6 @@ function [fList,check] = doTmpCheckList(wrkDir, subID, sesID, varargin)
 
 %% Set up things
 
-if nargin > 3
-    fOmit = varargin{1};
-else
-    fOmit = [];
-end
 if nargin > 4
     error('Too many input arguments.');
 end
@@ -59,25 +54,28 @@ nF = length(tmpList); % number of files in the folder (and sub-folders)
 if isempty(tmpList)
     fList = [];
     check = 1;
+elseif ~isempty(tmpList) && isempty(fomit)
+    fList = cell(nF,2);
+    check = 0;
+    for ii = 1:nF
+        % file name and path must be concatenated
+        fList{ii,1} = fullfile(fullPath,tmpList(ii).name);
+        fList{ii,2} = 0;
+    end
 else
     fList = cell(nF,2);
     check = 1;
     % Now let's record the file names
     for ii = 1:nF
-        % file name and path must be concatenated
-        fList{ii,1} = fullfile(fullPath,tmpList(ii).name);
-        if isempty(strfind(tmpList(ii).name, fOmit))
-            check=check*0;
-            fList{ii,2} = 0;
-        else
-            fList{ii,2} = 1;
+        for jj = 1:length(fOmit)
+            % file name and path must be concatenated
+            fList{ii,1} = fullfile(fullPath,tmpList(ii).name);
+            if isempty(strfind(tmpList(ii).name, fOmit{jj}))
+                check=check*0;
+                fList{ii,2} = 0;
+            else
+                fList{ii,2} = 1;
+            end
         end
     end
 end
-
-
-
-
-
-
-

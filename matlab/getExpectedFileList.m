@@ -50,13 +50,7 @@ end
 %%
 
 % Read the config (json) file
-fid = fopen(configFile, 'r');
-% Get the text
-txt = fscanf(fid, '%s');
-% Decode the json structure
-fExp = jsondecode(txt);
-nf = length(fExp.descriptions);
-
+fExp = read_sc(configFile);
 
 %%
 

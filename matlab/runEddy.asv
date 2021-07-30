@@ -65,9 +65,32 @@ end
 all_dwis_path = sprintf(eddyDir, 'allDwis.nii.gz');
 all_bval_path = sprintf(eddyDir, 'allBval.bval');
 all_bvec_path = sprintf(eddyDir, 'allBvec.bvec');
+% temporary variable for dwi volumes tracking
+tmp_dwi = [];
 
-[mrg_status, mrg_res] = mergeDwiData(dwiData, all_dwis_path, all_bval_path, all_bvec_path);
-
+if ~exist(all_dwis_path, 'file')
+    In = dwiData.(acqs{ii}); % make things easier to read
+    % open b-val and b-vecs files
+    % define tmp variables
+    bval = [];
+    bvec = [];
+    % Loop over the acquisitions
+    for ii = 1 : n_acqs
+        tmp_dwi = [tmp_dwi ' ' In.vol ];
+        tmp_bval = load_bVal(In.bval);
+        bval = cat(2, bval, tmp_bval);
+        tmp_bvec = importdata(In.bvec);
+        bvec = cat(2, bvec, tmp_bvec);
+    end
+    % Run the merging command
+    mrg_cmd = sptintf('fslmerge -t %s %s', all_dwis_path, tmp_dwi);
+    mrg_status = runSystemCmd(mrg_cmd, 1);
+    % Get the bval/bvec files
+    mk_bvalFile(bval, all_bval_path);
+    mk_bvecFile(bvec, all_bvec_path);
+else
+    warning('File %s already exist, DWIs stacks NOT merged.', all_dwis_path);
+end
 
 %% Now let's define the idx file. This should have an index correpsonding 
 % to the line ...
@@ -76,8 +99,35 @@ all_bvec_path = sprintf(eddyDir, 'allBvec.bvec');
 idx_path = fullfile(eddyDir, 'inidices.txt');
 
 
-getEddyIdxFile(all_dwis_path, all_bval_path, idx_path);
+getEddyIdxFile()
 
+% load the dwis and check how many volumes are there
+all_dwis = load_untouch_nii(all_dwis_path);
+n_dwis = all_dwis.hdr.dime.dim(5);
+% load the all-bvalues file
+all_bvals = load_bVal(all_bval_path);
+
+
+if ~exist(idx_path, 'file')
+    % Check if there is a mismatch between all_dwis number and all b-values
+    if n_dwis ~= length(all_bvals)
+        error('mismatch between number of volumes in %s and b-values in %s', ...
+           all_dwis_path,  all_bval_path);
+    end
+    % open the file
+    fid = fopen(idx_path, 'w+');
+    tmp_idx = 0;
+    % loop over the dwi volumes
+    for ii = 1: n_dwis
+        if all_bvals(ii) == 0
+            tmp_idx = tmp_idx+1;
+        end
+        fprintf(idx_path, '%d\n', tmp_idx);
+    end
+    fclose(fid);
+else
+    warning('File %s already exist, idx_path not overwritten.', idx_path);
+end
 
 
 

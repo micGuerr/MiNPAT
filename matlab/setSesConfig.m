@@ -71,6 +71,7 @@ config.dwi.topup.cnfg = [];
 config.dwi.topup.bsname = [];
 config.dwi.topup.field = [];
 config.dwi.topup.b0unwrp = [];
+config.dwi.topup.acqp = [];
 config.dwi.topup.outc = [];
 
 % step 2.2 bet

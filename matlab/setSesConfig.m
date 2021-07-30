@@ -30,7 +30,7 @@ config.dcm2nii = [];
 config.dcm2nii.dcm_subID = [];
 config.dcm2nii.dcm_sesID = [];
 config.dcm2nii.configFile = [];
-config.dcm2nii.configFile.excl = [];
+config.dcm2nii.configFile_excl = [];
 
 % outputs
 config.dcm2nii.expFileList = [];

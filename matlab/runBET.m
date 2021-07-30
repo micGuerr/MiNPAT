@@ -28,25 +28,15 @@ if ~exist(out_dir, 'dir')
     mkdir(out_dir);
 end
 
-%% Neaxt load the b0 and check if it has a fourth dimension.
+%% If the b0 has a fourth dimension, compute mean along that direction.
 
+% load the b0
 b0 = load_untouch_nii(b0_file);
-% separate path and name, this will be useful later
-[b0_path, b0_name] = niftiFileParts(b0_file);
-
-% if the foutrh dimension is greatr then 1, compute the mean along that dim
+% check the dimensionality and set bet input
 if b0.hdr.dime.dim(5) > 1
-    % create the output name for the mean of the b0s
-    b0_mean = fullfile(b0_path, sprintf('%s_mean.nii.gz', b0_name));
-    % the command to obtain the mean
-    mean_cmd = sprintf('fslmaths %s -Tmean %s', b0, b0_mean);
-    % run the command
-    [mean_status] = runSystemCmd(mean_cmd, 0);
-    % define a new input for bet
-    in_bet = b0_mean;
+    [in_bet, tmean_stat, tmean_res] = compute_tMean(b0_file);
 else
-    % else the input doesn't change
-    in_bet = b0;
+    in_bet = b0_file;
 end
 
 %% Run the brain extracion
@@ -55,14 +45,6 @@ end
 brain = fullfile(out_dir, sprintf('%s_brain.nii.gz', b0_name));
 mask = fullfile(out_dir, sprintf('%s_brain_mask.nii.gz', b0_name));
 
-% make sure the file don't exist already
-if ~exist(brain, 'file')
 
-bet_cmd = sprintf('bet %s %s -m -f %f', ...
-                    in_bet, b0_mean, f);
-% run the command
-[status] = runSystemCmd(bet_cmd, 0);
-
-else
-    warning('File %s already exist, BET didn''t run !', brain)
-end
+% Run bet command
+[status] = runBet_cmd(in_bet, brain, f);

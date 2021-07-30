@@ -7,11 +7,11 @@ function    [] = mk_bvecFile(bvec, bvecFile_path)
 
 bvec_id = fopen(bvecFile_path, 'w+');
 
-fprintf(bvec_id,'%d\t', bvec(1,:));
+fprintf(bvec_id,'%f\t', bvec(1,:));
 fprintf(bvec_id,'\n');
-fprintf(bvec_id,'%d\t', bvec(1,:));
+fprintf(bvec_id,'%f\t', bvec(1,:));
 fprintf(bvec_id,'\n');
-fprintf(bvec_id,'%d\t', bvec(1,:));
+fprintf(bvec_id,'%f\t', bvec(1,:));
 
 fclose(bvec_id);
 

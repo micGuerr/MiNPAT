@@ -1,4 +1,4 @@
-function [eddy_outp, status] = runEddy(dwiData, topup, mask, acqp_file, baseName, parall)
+function [eddy_dwi, eddy_bval, eddy_bvec, status] = runEddy(dwiData, topup, mask, acqp_file, baseName)
 % 
 % Runs FSL's Eddy
 %
@@ -23,20 +23,9 @@ function [eddy_outp, status] = runEddy(dwiData, topup, mask, acqp_file, baseName
 %% First thing, let's parse the DWI acquisition information. 
 %  Let's check everything needed is there.
 
-acqs = fieldnames(dwiData);
-n_acqs = length(acqs);
 
 % The fields "vol", "bval", "bvec", "sc" are expected for each acquisition
-for ii = 1 : n_acqs
-    In = dwiData.(acqs{ii}); % make things easier to read
-    if ~isfield(In, 'vol') || ...
-            ~isfield(In, 'bval') || ...
-            ~isfield(In, 'bvec') || ...
-            ~isfield(In, 'sc')
-        error('''vol'', ''bval'', ''bvec'' or ''sc'', missing in acquisition %s !!', ...
-            acqs{ii} );
-    end
-end
+CheckDwiDataFields(dwiData)
 
 % Let's make sure that topup run
 if ~exist( [topup, '_fieldcoef.nii.gz'], 'file')
@@ -51,7 +40,7 @@ end
 %% Next, check the output folder exists. If not create it
 
 % extract topup folder from the baseName
-[eddyDir, eddyBname] = fileparts(baseName);
+[eddyDir] = fileparts(baseName);
 
 if ~exist(eddyDir, 'dir')
     mkdir(eddyDir);
@@ -75,10 +64,38 @@ all_bvec_path = sprintf(eddyDir, 'allBvec.bvec');
 % define the output indices file
 idx_path = fullfile(eddyDir, 'inidices.txt');
 
-
 getEddyIdxFile(all_dwis_path, all_bval_path, idx_path);
 
 
-
-
 %% Run Eddy
+
+% First define the outputs
+eddy_dwi = [baseName '.nii.gz'];
+eddy_bvec = [baseName '.eddy_rotated_bvecs'];
+eddy_bval = [baseName '.eddy_bvals'];
+
+% there are two ways to combine the dwi data. This depends on whether
+% the acquisition images have exactly the same acquisition params or not
+
+% Check if the acquisition protocols are the same
+is_eq = isSameProtcol(dwiData);
+
+% based on this the output will have same dimension of the input (no lsr)
+% or will have same dimension of a single acquistion input (lsr)
+acqs = fieldnames(dwiData);
+if ~exist(eddy_bval, 'file')
+    if is_eq
+        copyfile(dwiData.(acqs{1}).bval, eddy_bval);
+    else
+        copyfile(all_bval_path, eddy_bval);
+    end
+else
+    warning('file %s already exist', eddy_bval);
+end
+
+
+    % If everything is equal then use "Least-Squares Restoration".
+[status, result] = runEddyCmd(all_dwis_path, all_bval_path, all_bvec_path, mask, ...
+                                acqp_file, idx_path, topup, ...
+                                    is_eq, baseName);
+

@@ -54,7 +54,7 @@ nF = length(tmpList); % number of files in the folder (and sub-folders)
 if isempty(tmpList)
     fList = [];
     check = 1;
-elseif ~isempty(tmpList) && isempty(fomit)
+elseif ~isempty(tmpList) && isempty(fOmit)
     fList = cell(nF,2);
     check = 0;
     for ii = 1:nF
@@ -67,15 +67,19 @@ else
     check = 1;
     % Now let's record the file names
     for ii = 1:nF
+        tmp_check = 0;
+        % file name and path must be concatenated
+        fList{ii,1} = fullfile(fullPath,tmpList(ii).name);
         for jj = 1:length(fOmit)
-            % file name and path must be concatenated
-            fList{ii,1} = fullfile(fullPath,tmpList(ii).name);
+            % do the checks
             if isempty(strfind(tmpList(ii).name, fOmit{jj}))
-                check=check*0;
                 fList{ii,2} = 0;
             else
                 fList{ii,2} = 1;
+                tmp_check = 1;
+                break
             end
         end
+        check = tmp_check*check;
     end
 end

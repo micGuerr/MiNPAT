@@ -43,7 +43,7 @@ sesid = ''; % This is the ID you want to assigne to this session e.g.: '01'
 config.dcm2nii.dcm_sesID = ''; % This is the dcm folder ID of the session e.g.: 's56454'
 config.dcm2nii.configFile = ''; % This is the config fle for this specific session 
                                 %  e.g.: '/Users/<myUsername>/BIDSconfig.json')
-config.dcm2nii.configFile.excl = {'localizer', 'noise'}; % Allows to ...
+config.dcm2nii.configFile_excl = {'localizer', 'noise'}; % Allows to ...
 config.parall = []; % Set the number of cores you want to use for parallel computing (it should be an integer!).
                     % leave empty otherwise.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

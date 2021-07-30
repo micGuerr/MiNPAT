@@ -47,10 +47,14 @@ ftype = fsplits{end};
 % Define output name
 outname = fullfile(fpath, sprintf('%s.png', fname));
 
-%% Set different options for different file types
-[frac, intensity, scale] = setPicturePref(ftype, fname);
+% check if the file exists
+if ~exist(outname, 'file')  
+    %% Set different options for different file types
+    [frac, intensity, scale] = setPicturePref(ftype, fname);
     
-%% Do the job
-
-getOrthoView(filename, frac, intensity, scale, outname)
+    %% Do the job
+    getOrthoView(filename, frac, intensity, scale, outname)
+else
+    warning('File %s already exist!', outname);
+end
 

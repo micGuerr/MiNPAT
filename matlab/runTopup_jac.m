@@ -21,6 +21,16 @@ function [status] = runTopup_jac(all_b0s_path, acqp_file, cnf, baseName, rfield,
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
+%% First check Topup output is not there
+
+% expected output is
+out_topup = [baseName '_fieldcoef.nii.gz'];
+
+if exist(out_topup, 'file')
+    warning('It seems topup has been already run. Deleate the existing files if you want to re-run this analysis');
+    return
+end
+
 %%
 
 fprintf(' ************************* Running TOPUP ****************************\n');

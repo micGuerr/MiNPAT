@@ -39,7 +39,7 @@ config.dcm2nii.outc = dcm2nii(DICOMDIR, dcm_subID, dcm_sesID, dcm2nii_configFile
 config.dcm2nii.expFileList = getExpectedFileList(dcm2nii_configFile, subID, sesID);
 
 % run QC
-config.dcm2nii.qc.outc = qcRawData(RAWDIR, subID, sesID, dcm2nii_configFile);
+config.dcm2nii.qc.outc = qcRawData(RAWDIR, subID, sesID, dcm2nii_configFile, config.dcm2nii.configFile_excl);
 
 %% STEP 1.      ANATOMICAL ANALYSIS
 %% Step 1.0     Folder structure and inputs definition
@@ -108,15 +108,14 @@ config.dwi.bet.outpath = fullfile(config.dwi.path, 'bet');
 
 %% Step 2.3     Run EDDY
 
-config.dwi.eddy.bsname = fullfile(config.dwi.path, 'eddy', 'eddy');
+config.dwi.eddy.bsname = fullfile(config.dwi.path, 'eddy', 'eddycorr');
 
 [config.dwi.eddy.outp, ...
     config.dwi.eddy.outc] = runEddy(config.dwi.input, ...  
                                 config.dwi.topup.outpath, ...
                                     config.dwi.bet.mask, ...
                                         config.dwi.topup.acqp, ...
-                                            config.dwi.eddy.bsname, ...
-                                                config.parall);
+                                            config.dwi.eddy.bsname);
 %% Step 2.4     Run DTI fit
 
 config.dwi.dti.outpath = fullfile(config.dwi.path, 'dti', 'dti');

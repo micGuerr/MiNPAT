@@ -117,7 +117,7 @@ for ii = 1:length(idx)
             
             % Check whether the linking process gave positive results
              if ~status_sc
-                 status = status_qc;
+                 status = status_sc;
              end
         end
     end 

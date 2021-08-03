@@ -1,8 +1,8 @@
-# NeuroPlasticity Microstructural Analysis Toolbox (...)
+# Microstructural NeuroPlasticity Analysis Toolbox (MiNPAT)
 
 This software intends to provide a set of tools and an analysis framework for the detection of microstructural brain changes.
 
-It has been specifically designed for the analysis of neuroplastic changes and thus offers specific features for the processing of data where multiple acquisitions are available for each subject.
+It has been specifically designed for the analysis of neuroplastic changes. To monitor this type of changes multiple acquisitions, at different time points, are conventionally acquired for each subject, hance the toolbox offers specific analysis features for the processing of data where multiple acquisitions are available for each subject.
 
 Nonetheless, the pipeline offers strams of analysis for single session acquisitions as well.
 
@@ -10,7 +10,7 @@ Nonetheless, the pipeline offers strams of analysis for single session acquisiti
 
 The Software is compatible with both Linux and macOS based machines. It can also be used with Windows operating system, but some [extra requirements]() are needed.
 
-You can find the instructions to download and install LongAnMRI [here](doc/installation/longan.md).
+You can find the instructions to download and install MiNPAT [here](doc/installation/minpat_install.md).
 
 ## Matlab and Python
 

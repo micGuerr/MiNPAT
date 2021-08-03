@@ -1,6 +1,10 @@
-# LongAnMRI Download and installation
+# MiNPAT Download and installation
 
 ## Download
+
+### Download via MATLAB
+
+Matlab provides a simple GUI to download a Git respository. The documentation of this functionality is available [here](https://it.mathworks.com/help/simulink/ug/clone-git-repository.html). You can find the process illustrated by the following set of screenshots: [step1](figs/matlabGitRetrieval1), [step2](figs/matlabGitRetrieval2), [step3](figs/matlabGitRetrieval3).
 
 ### Download via git
 
@@ -12,8 +16,8 @@ git --version
 Something like `git version 2.17.1` should be prompted.
 In case you get an error instead, you can install git following [this](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) simple guide.
 
-### Clone LongAnMRI
-Navigate to the folder where you would like to save LongAnMRI via the `cd` command. Run the following command from terminal, substituting the <path_to_folder> with the path of your target folder:
+### Clone MiNPAT
+Navigate to the folder where you would like to save MiNPAT via the `cd` command. Run the following command from terminal, substituting the <path_to_folder> with the path of your target folder:
 ```bash
 cd <path_to_folder>
 ```

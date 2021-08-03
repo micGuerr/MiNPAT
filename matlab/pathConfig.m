@@ -9,14 +9,14 @@ global FREESURFER_HOME SUBJECTS_DIR
 global DICOM2NIIX DICOM2BIDS
 global IMGMAGICK
 global NODDI
-global LONGANPATH
+global MINPAT
 
 %% BASH PATHS CONFIGURATION
 
 % LONGAN configuration
-setenv('LONGAN_ROOT', LONGANPATH);
-setenv('PATH', [ fullfile(getenv('LONGAN_ROOT'),'bin') ':' getenv('PATH')]);
-runSystemCmd(sprintf('chmod +x %s', fullfile(getenv('LONGAN_ROOT'),'bin' ,'*')), 0);
+setenv('MINPAT_ROOT', MINPAT);
+setenv('PATH', [ fullfile(getenv('MINPAT_ROOT'),'bin') ':' getenv('PATH')]);
+runSystemCmd(sprintf('chmod +x %s', fullfile(getenv('MINPAT_ROOT'),'bin' ,'*')), 0);
 
 % FSL configuration
 setenv('FSLDIR', FSLDIR);

@@ -89,19 +89,25 @@ Below, an explanation of each of the fields.
 
 Before starting a new session/subject analysis, there are a few things to setup:
 
-1. First, you need to create a copy of the template file `<path_to_new_project_folder>/logs/log_subXXX.txt`. A new copy will need to be created **every time you start a new subject analysis**. This file will store all the steps of the session and subject level analysis which will be performed for that specific subject. 
+1. First, you need to create a copy of the template file `<path_to_new_project_folder>/logs/log_subXXX.txt`. **A new copy will be needed every time you want to analyze a new subject**. This file will store all the steps of the session and subject level analysis which will be performed for that specific subject. 
     * You should copy the file in the very same folder (`<path_to_new_project_folder>/log`).
     * You should change the file extension from *.txt* to *.m*.
     * You should modify the file name so to include a **unique ID for that subject**.
+
 Assuming the subject ID is `001`, the command from terminal would be:
 ```bash
 mv <path_to_new_project_folder>/log/log_subXXX.txt <path_to_new_project_folder>/log/log_sub001.m
 ```
 
-2. Next, from Matlab, you should open the newly created file (` <path_to_new_project_folder>/log/log_sub001.m` in the example) and modify the following fields:
+2. Next, from Matlab, open the newly created file (` <path_to_new_project_folder>/log/log_sub001.m` in the example) and modify the following components:
     * Modify the function name (1st line) consistently with the name assigned to the file: e.g. `function log_subXXX()` ==> `function log_sub001()`.
     * Define the subject ID, consistently with the one used to name the file (line 24): e.g. `subid = '001';`.
     * Add the name of the folder (NOT the path to the folder) containing the subject DICOM data (line 30): e.g. `dcm_subid = 'S01';`.
+    * Insert the number of cores you would like to use in your analysis...
 
-3. s
-
+3. In the same file, duplicate the session level analysis (from line 38 to line 57) as many times as the number of session available for that specific subject. Modify the following components:
+    * Assigne each session an ID (line 42): e.g. `sesid = '01';`.
+    * Add the name of the folder (NOT the path to the folder) containing the session DICOM data (line 43): e.g. `config.dcm2nii.dcm_sesID = 's12345';`.
+    * Add the path to the *.json* configuration file for that specific session (line 44): e.g. `config.dcm2nii.configFile = '/Users/<username>/myBIDSconfigFile.json';`.
+    * ...
+    * Modify the comment line labeling the new session analysis consistently with the ID you used (line 41): e.g. `%% Session # XX` ==> `%% Session # 01`.

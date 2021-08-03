@@ -52,7 +52,7 @@ b0 = getTopupB0s(dwiData, topupDir);
 all_b0s_path = fullfile(topupDir, 'all_b0.nii.gz');
 
 % merge the b0s
-[mrg_cmd, mrg_status] = mergeDwiData(all_b0s_path, [], []);
+[mrg_cmd, mrg_status] = mergeDwiData(b0, all_b0s_path, [], []);
 
 %% Now let's put the acquisition parameters in a file
 
@@ -66,8 +66,8 @@ getTopupAcqpFile(b0, acqp_file);
 %% Finally we can run the Topup command
 
 % Define the outputs
-rfield = fullfile('%s_rfield.nii.gz', baseName);
-unwarp_b0 = fullfile('%s_b0unwarp.nii.gz', baseName);
+rfield = sprintf('%s_rfield.nii.gz', baseName);
+unwarp_b0 = sprintf('%s_b0unwarp.nii.gz', baseName);
 
 % there are two ways to obtain the the unwarped images, depends on whether
 % the "blip-Up" and "blip-down" images ave exactly the same acquisition params or not

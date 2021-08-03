@@ -42,6 +42,6 @@ for ii = 1: n_dwis
     if all_bvals(ii) == 0
         tmp_idx = tmp_idx+1;
     end
-    fprintf(idxFile_out_path, '%d\n', tmp_idx);
+    fprintf(fid, '%d\n', tmp_idx);
 end
 fclose(fid);

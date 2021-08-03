@@ -41,6 +41,8 @@ end
 
 %% Run the brain extracion
 
+[b0_path, b0_name] = niftiFileParts(b0_file);
+
 % define the outputs
 brain = fullfile(out_dir, sprintf('%s_brain.nii.gz', b0_name));
 mask = fullfile(out_dir, sprintf('%s_brain_mask.nii.gz', b0_name));

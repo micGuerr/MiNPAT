@@ -88,8 +88,7 @@ for ii = 1:length(idx)
             % Instead of copying the file, to save space, create a link
             % But first check if the file already exist
             if ~exist(anatInput, 'file')
-                ln_cmd = sprintf('ln -s %s %s', vol_fullPath, anatInput);
-                status = runSystemCmd(ln_cmd, 0);
+                ln_files(vol_fullPath, anatInput);
             else
                 warning('File %s already exist',anatInput);
                 status = 0;
@@ -104,8 +103,7 @@ for ii = 1:length(idx)
                 anatInput_sc = fullfile(anatDir, [vol_name, '.json']);
                 % If it not already there creat the link
                 if ~exist(anatInput_sc, 'file')
-                    ln_sc_cmd = sprintf('ln -s %s %s', vol_sc, anatInput_sc);
-                    status_sc = runSystemCmd(ln_sc_cmd, 0);
+                    ln_files(vol_sc, anatInput_sc);
                 else
                     warning('File %s already exist',anatInput_sc);
                     status_sc = 0;

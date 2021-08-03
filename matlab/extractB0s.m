@@ -46,15 +46,15 @@ save_untouch_nii(b0, out_b0_path);
 acqp = zeros(1,4);
 ped = sc.PhaseEncodingDirection;
 % Get the PE direction
-if strcmp(ped(end), 'i')
+if strcmp(ped(1), 'i')
     acqp(1) = 1;
-elseif strcmp(ped(end), 'j')
+elseif strcmp(ped(1), 'j')
     acqp(2) = 1;
-elseif strcmp(ped(end), 'k')
+elseif strcmp(ped(1), 'k')
     acqp(3) = 1;
 end
 % Get the PE "verse"
-if strcmp(ped(1), '-')
+if strcmp(ped(end), '-')
     acqp = -1 * acqp;
 end
 

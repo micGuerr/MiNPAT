@@ -18,6 +18,8 @@ exp_output = [eddy_out '.nii.gz'];
 
 if exist(exp_output, 'file')
     warning('It seems Eddy command has already been run. Delate the existing ouput if you would like to repeat the analysis');
+    status = 0;
+    result = 0;
     return
 end
 
@@ -35,8 +37,8 @@ eddy_cmd = ['eddy_openmp  --imain=' dwis, ...
 
 % Change resampling method if required
 if do_lsr
-    fprintf('Using "Least-Squares Restoration" for resampling ...');
-    eddy_cmd = [eddy_cmd ' --resamp=lsr'];
+    fprintf('Using "Least-Squares Restoration" for resampling ... \n');
+    eddy_cmd = [eddy_cmd ' --resamp=lsr --fep'];
 end
 
 % Check if the eutput is already there

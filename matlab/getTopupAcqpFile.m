@@ -31,7 +31,7 @@ for ii = 1 : n_acqs
     % loop over the b0s
     for jj = 1 :  In.n_b0
         % print the parameters
-        fprintf(fid, '%s %s %s %s\n', In.acqp(:) );
+        fprintf(fid, '%d %d %d %f\n', In.acqp(:) );
     end
 end
 

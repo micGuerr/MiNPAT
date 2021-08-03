@@ -82,14 +82,18 @@ config.dwi.bet.outc = [];
 
 % step 2.3 eddy
 config.dwi.eddy.bsname = [];
-config.dwi.eddy.outp = [];
+config.dwi.eddy.dwi = [];
+config.dwi.eddy.bval = [];
+config.dwi.eddy.dvec = [];
 config.dwi.eddy.outc = [];
 
 % 2.4 dti fit
 config.dwi.dti.outp = [];
 config.dwi.dti.outc = [];
 
-
+% 2.5 refinemask
+config.dwi.farrm.mask = [];
+config.dwi.farrm.dt = [];
 
 
 

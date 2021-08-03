@@ -17,13 +17,15 @@ tMean = fullfile(niftiFile_path, sprintf('%s_tmean.nii.gz', niftiFile_name));
 if exist(tMean, 'file')
     warning('file %s already exist. Deleate the existing file if you want to re-run this analysis', ...
         tMean);
+    status = 0;
+    result = 0;
     return
 end
 
 %%
 
 % Define the command
-mean_cmd = sprintf('fslmaths %s -Tmean %s', b0, b0_mean);
+mean_cmd = sprintf('fslmaths %s -Tmean %s', niftiFile, tMean);
 % run the command
 [status, result] = runSystemCmd(mean_cmd, 1);
 

@@ -96,17 +96,13 @@ for ii = 1:length(idx)
             if ~exist(dwiVol, 'file') && ~exist(dwiBval, 'file') ...
                     && ~exist(dwiBvec, 'file') && ~exist(dwiSc, 'file')
                 % link the diffusion data
-                ln_cmd1 = sprintf('ln -s %s %s', vol_fullPath, dwiVol);
-                st1 = runSystemCmd(ln_cmd1, 0);
-                % link the bvalues 
-                ln_cmd2 = sprintf('ln -s %s %s', vol_bval, dwiBval);
-                st2 = runSystemCmd(ln_cmd2, 0);
+                st1 = ln_files(vol_fullPath, dwiVol);
+                % link the bvalues
+                st2 = ln_files(vol_bval, dwiBval);
                 % link the bvecs
-                ln_cmd3 = sprintf('ln -s %s %s', vol_bvec, dwiBvec);
-                st3 = runSystemCmd(ln_cmd3, 0);
+                st3 = ln_files(vol_bvec, dwiBvec);
                 % link the sidecar file
-                ln_cmd4 = sprintf('ln -s %s %s', vol_sc, dwiSc);
-                st4 = runSystemCmd(ln_cmd4, 0);
+                st4 = ln_files(vol_sc, dwiSc);
                 % final status
                 status = ~(~st1 * ~st2 * ~st3 * ~st4);
             else
@@ -122,11 +118,6 @@ for ii = 1:length(idx)
             I.(acqID).bval = dwiBval;
             I.(acqID).bvec = dwiBvec;
             I.(acqID).sc = dwiSc;
-                        
-            % Check whether the linking process gave positive results
-             if ~status_sc
-                 status = status_sc;
-             end
         end
     end 
 end

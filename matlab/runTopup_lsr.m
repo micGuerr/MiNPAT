@@ -29,6 +29,7 @@ out_topup = [baseName '_fieldcoef.nii.gz'];
 
 if exist(out_topup, 'file')
     warning('It seems topup has been already run. Deleate the existing files if you want to re-run this analysis');
+    status = 0;
     return
 end
 
@@ -66,21 +67,21 @@ fprintf('\n STEP2: Apply correction to b0 volumes only...\n');
 % index to which they correspnd to in the acqp.txt file
 acqs = fieldnames(b0);
 n_acqs = length(acqs);
-b0_list = [];
-idx_list = [];
-for ii = 1:n_acqs
+b0_list = b0.(acqs{1}).vol;
+idx_list = 1;
+for ii = 2:n_acqs
     In = b0.(acqs{ii});
-    b0_list = [b0_list ',' In.b0s];
+    b0_list = [b0_list ',' In.vol];
     tmp_idx = In.n_b0*(ii-1) + 1;
-    idx_list = [idx_list ',' tmp_idx];
+    idx_list = [ int2str(idx_list) ',' int2str(tmp_idx)];
 end
 
 
-apply_cmd = ['applytopup --imain='  b0_list, ...
-    ' --inindex=' idx_list, ...
-    ' --datatin=' acqp_file , ...
-    ' --topup=' acqp_file , ...
-    ' --out=' unwarp_b0];
+apply_cmd = ['applytopup -i '  b0_list, ...
+    ' -x ' idx_list, ...
+    ' -a ' acqp_file , ...
+    ' -t ' baseName , ...
+    ' -o ' unwarp_b0];
 
 [status,apply_res] = runSystemCmd(apply_cmd, 1);
 

@@ -111,3 +111,8 @@ mv <path_to_new_project_folder>/log/log_subXXX.txt <path_to_new_project_folder>/
     * Add the path to the *.json* configuration file for that specific session (line 44): e.g. `config.dcm2nii.configFile = '/Users/<username>/myBIDSconfigFile.json';`.
     * ...
     * Modify the comment line labeling the new session analysis consistently with the ID you used (line 41): e.g. `%% Session # XX` ==> `%% Session # 01`.
+
+4. [Work in progress... At the end of the file, input the session IDs you used into the `subjectLevelAnalysis()` function so to run the session level analsysis taking into account all teh session .].
+
+
+You are now ready to run the session/subject level analysis. Check out the [run session level analysis](runSesLevelAn.md) and [run subject level analysis](runSubLevelAn.md) sections for more info.

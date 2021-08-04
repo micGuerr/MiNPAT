@@ -1,5 +1,7 @@
 # Inputs and Outputs
 
+![io](figs/minpat_io.png)
+
 ## Input
 
 MiNPAT is designed to  provide a set of tools and an analysis framework for the detection of microstructural brain changes.
@@ -19,6 +21,9 @@ MiNPAT computes imaging features form the diffusion data, *aka* image derived ph
 * Cortical surface spatial correspondece, optimaized for cortical gray matter (GM) analysis.
 * Region of interest (ROI) correspondece, optimaized for sub-cortical GM analysis.
 
+![workflow](figs/minpat_wrkflow.png)
+
+
 ## Workflow
 
 The pipeline can be diveded in three **levels (or units) of analysis**:
@@ -28,4 +33,5 @@ The pipeline can be diveded in three **levels (or units) of analysis**:
 2. The second level is the [**subject level analysis**](subLevelAn.md). For each subject, this unit integrates the outputs from the session level analysis steps of all subject's time points. Among other things, this step defines a correspondence between time points of a same subject, as the subject head is lickely to change pose between one session and another. This step is not needed if the input data have a single session only.
 
 3. The third level is the [**population level analysis**](popLevelAn.md). This unit integrates the information from all the sessions and all the subjects. It is ment to bring all derived imagin features in a common space mackin possible a comparison.
+
 

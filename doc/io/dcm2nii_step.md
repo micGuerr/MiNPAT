@@ -65,13 +65,13 @@ What should you check to make sure the step ended successfully?
 2. Open one by one the Nifti images and check the quality of the data is good enough. You don't know how the data should look like? Check below for some examples.
 
 #### T1w
-![t1w](figs/rawData/anat/T1w.png)
+![t1w](figs/RawData/anat/T1w.png)
 #### T2w
-![t1w](figs/rawData/anat/T2w.png)
+![t1w](figs/RawData/anat/T2w.png)
 #### DWI with anterior-posterior phase encoding
-![t1w](figs/rawData/dwi/AP.png)
+![t1w](figs/RawData/dwi/AP.png)
 #### DWI with posterior-anterior phase encoding
-![t1w](figs/rawData/dwi/PA.png)
+![t1w](figs/RawData/dwi/PA.png)
 
 
 

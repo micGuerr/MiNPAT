@@ -36,8 +36,11 @@ Clicking on the links you will find a brief overview on how to donwload and inst
 
 NB: It is important to keep track of the location on your machine (paths) where the softwares are installed. This information will be used for their configuration (check next steps).
 
+# Inputs and Outputs
 
-## Getting Started
+A description of the inputs needed to start the analysis and of the outputs provided by the software is available at [`doc/io/`](doc/io).
+
+# Getting Started
 
 Tutorials/demos are provided in the folder [`doc/demos/`](doc/demos/) to help you get started with the MiNPAT framework.
 

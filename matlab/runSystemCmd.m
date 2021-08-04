@@ -28,7 +28,7 @@ elseif ispc
     cmd = erase(cmd, '//wsl$/Ubuntu');
     if print;  fprintf('%s\n',cmd); end
     status = 0;
-    result = 0;
+    result = [];
     %[status,result] = system(['wsl ' cmd], '-echo'); % Code to run on Windows platform
 else
     disp('Platform not supported')

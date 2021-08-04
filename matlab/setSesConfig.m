@@ -1,4 +1,4 @@
-function config = setSesConfig()
+function config = setSesConfig(subid, sesid, dcm_subid, dcm_sesid, dcm2nii_configFile, dxc2nii_exclCriter, n_cores, logFile)
 % 
 % Creates a default structure with fields in which to store relevant 
 % information for session level analysis of neuroplasticity micostrucutral
@@ -20,17 +20,19 @@ config = struct();
 
 %% First thing, let's define important fields
 
-config.sesID = []; % the session ID field
-config.parall = []; % number of cores to be used in the analysis
+config.subID = subid;
+config.sesID = sesid; % the session ID field
+config.logFile = logFile;
+config.parall = n_cores; % number of cores to be used in the analysis
 
 %% STEP 0. dicom 2 nifti conversion
 
 % inputs
 config.dcm2nii = [];
-config.dcm2nii.dcm_subID = [];
-config.dcm2nii.dcm_sesID = [];
-config.dcm2nii.configFile = [];
-config.dcm2nii.configFile_excl = [];
+config.dcm2nii.dcm_subID = dcm_subid;
+config.dcm2nii.dcm_sesID = dcm_sesid;
+config.dcm2nii.configFile = dcm2nii_configFile;
+config.dcm2nii.configFile_excl = dxc2nii_exclCriter;
 
 % outputs
 config.dcm2nii.expFileList = [];

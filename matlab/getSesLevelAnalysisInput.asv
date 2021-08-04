@@ -1,4 +1,4 @@
-function [stramPath, I, status] = getSesLevelAnalysisInput(rawDataDir, fileList, subLevlAn_dir, subID, sesID, stream, logFile)
+function [stramPath, I, status] = getSesLevelAnalysisInput(rawDataDir, fileList, subLevlAn_dir, subID, sesID, stream)
 % 
 % 1. Identifies the input files for session level analysis, given the file 
 %    list from the raw data folder and the analysis stram you want to run.
@@ -39,26 +39,11 @@ stepTitle = sprintf('Input and folder struct definition of %s stram', stream);
 
 switch stream
     case 'anat'
-        [I, tmp_stat, tmp_res] = getAnatAnalysisInput(rawDataDir, fileList, stramPath, subID, sesID);
+        [I, tmp_status] = getAnatAnalysisInput(rawDataDir, fileList, stramPath, subID, sesID);
     case 'dwi'
-        [I, tmp_stat, tmp_res] = getDwiAnalysisInput(rawDataDir, fileList, stramPath, subID, sesID);
+        [I, tmp_status] = getDwiAnalysisInput(rawDataDir, fileList, stramPath, subID, sesID);
     case 'func'
-        [I, tmp_stat, tmp_res] = getFuncAnalysisInput(rawDataDir, fileList, stramPath, subID, sesID);
+        [I, status] = getFuncAnalysisInput(rawDataDir, fileList, stramPath, subID, sesID);
     otherwise
         error('Unknown ''%s'' stream !!', stream);
 end
-
-
-%% log the result and check the status
-
-status = ~(~status * ~tmp_stat);
-result = sprintf('%s\n%s',result, tmp_res);
-
-% Log the result into a log file
-logResult(stepTitle, result, logFile);
-
-% Check process status, output an error if something didn't work
-if ~status
-    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
-end
-

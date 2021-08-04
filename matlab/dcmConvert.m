@@ -1,4 +1,4 @@
-function status = dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
+function [status, result] = dcmConvert(dcmFolder, subID, sesID, configFile, outpFolder)
 % 
 % Converts dicom files into NIfTI format. The data are authomatically
 % organized into a pre-defined structure which follows the BIDS standard
@@ -49,4 +49,4 @@ fprintf('Session ID: %s\n', sesID);
 fprintf('Final command is:\n\n');
 
 % execte the command from the operating system
-status = runSystemCmd(dcm2bids_cmd,1);
+[status, result] = runSystemCmd(dcm2bids_cmd, 1);

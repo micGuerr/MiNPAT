@@ -80,13 +80,11 @@ mkdir(config)
 
 %% Copy config file and log template into corresponding folders
 
-logSub_source = fullfile(tbx_path, 'log_subXXX.txt');
-logSub_dest = fullfile(log, 'log_subXXX.txt');
-copyfile(logSub_source, logSub_dest);
-
 pathSetup_source = fullfile(tbx_path, 'pathSetup.txt');
 pathSetup_dest = fullfile(config, 'pathSetup.m');
-copyfile(pathSetup_source, pathSetup_dest);
+if ~exist(pathSetup_dest, 'file')
+    copyfile(pathSetup_source, pathSetup_dest);
+end
 
 %% Automatically update the pathSetup.m file
 
@@ -97,12 +95,12 @@ update_pathSetup(pathSetup_dest, {'MINPAT'}, ...
                     {plasticity_path} );
 
 % Update the analysis folder paths
-update_pathSetup(pathSetup_dest, {'DICOMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'}, ... 
-                    {dicomData_path, rawdat, popan, suban} );
+update_pathSetup(pathSetup_dest, {'PROCESSDIR', 'DICOMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'}, ... 
+                    {processingFolder_path, dicomData_path, rawdat, popan, suban} );
                 
 % Update the external softares paths if correctly configured on this system
-update_pathSetup(pathSetup_dest, {'FSLDIR', 'FREESURFER_HOME', 'DTITK', 'IMGMAGICK'}, ... 
-                    {getenv('FSLDIR'), getenv('FREESURFER_HOME'), getenv('DTITK_ROOT'), getenv('MAGICK_HOME')} );
+update_pathSetup(pathSetup_dest, {'FSLDIR', 'FREESURFER_HOME', 'DTITK'}, ... 
+                    {getenv('FSLDIR'), getenv('FREESURFER_HOME'), getenv('DTITK_ROOT')} );
 
                 
 % Update Matlab toolboxes paths
@@ -121,8 +119,13 @@ if ~isempty(dcm2bids_path) && ~bidsStatus; dcm2bids_path = erase( dcm2bids_path,
 update_pathSetup(pathSetup_dest, {'DICOM2NIIX', 'DICOM2BIDS'}, ...
                     {dcm2niix_path(1:end-1), dcm2bids_path(1:end-1)} );
 
-%% Add the processing folder to the matlab path
+%% Add permanently the processing folder to the matlab path
 
+strtUpFile = fullfile(userpath,'startup.m');
 
+fid = fopen(strtUpFile, 'a+');
+fprintf(fid, ' addpath( genpath( ''%s'' ) );\n', processingFolder_path );
+fclose(fid);
 
+run(strtUpFile);
 

@@ -7,7 +7,6 @@ global FSLDIR
 global DTITK
 global FREESURFER_HOME SUBJECTS_DIR
 global DICOM2NIIX DICOM2BIDS
-global IMGMAGICK
 global NODDI
 global MINPAT
 
@@ -37,10 +36,6 @@ setenv('PATH', [ DICOM2NIIX ':'  getenv('PATH') ]);
 % dicom2bids configuration
 setenv('PATH', [ DICOM2BIDS ':'  getenv('PATH') ]);
 
-% ImageMagick configuration
-setenv('MAGICK_HOME', IMGMAGICK);
-setenv('PATH', [ fullfile(getenv('MAGICK_HOME'),'bin') ':'  getenv('PATH') ]);
-setenv('DYLD_LIBRARY_PATH', [ fullfile(getenv('MAGICK_HOME'),'lib') ':' getenv('DYLD_LIBRARY_PATH') ]);
 
 %% MATLAB PATHS CONFIGURATION
 

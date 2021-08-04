@@ -1,4 +1,4 @@
-function [status, fileList] = dcm2nii(dcmdir_path, dcm_subID, dcm_sesID, configFile, outpdir_path, subID, sesID, logFile)
+function [status, result] = dcm2nii(dcmdir_path, dcm_subID, dcm_sesID, configFile, outpdir_path, subID, sesID, logFile)
 % 
 % Performs DICOM to NIFTI conversion
 % 
@@ -32,10 +32,8 @@ function [status, fileList] = dcm2nii(dcmdir_path, dcm_subID, dcm_sesID, configF
 % It allows to convert multiple folders as a single time point.
 % it needs to check whether sesID_dcm is cell or char:
 
-%% Assinge a step title
+% Assinge a step title
 stepTitle = 'DICOM to NIfTI conversion';
-
-%% Run Dicom 2 nii coversio
 
 if ischar(dcm_sesID) % if char, assumes single folder for this timepoint
 
@@ -62,17 +60,10 @@ else
     error('%s should be a string or a cell of strings!');
 end
 
-%% Get the list of converted raw data 
-fileList = getExpectedFileList(configFile, subID, sesID);
-
-
-%% log the result and check the status
-
-
 % Log the result into a log file
 logResult(stepTitle, result, logFile);
 
 % Check process status, output an error if something didn't work
 if ~status
-    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+    error('Something');
 end

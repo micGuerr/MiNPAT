@@ -32,10 +32,20 @@ fclose(fid);
 n_fields = length(fields);
 
 for ff = 1 : n_fields
-    idx = find(contains(C,[fields{ff} ' = ']));
-    if ~isempty(idx) && ~isempty(paths{ff})
-        C{idx} = [fields{ff} ' = ''' paths{ff} ''';' ];
+    % looks for fields
+    idx1 = find(contains(C,[fields{ff} ' = ']));
+    if ~isempty(idx1) && ~isempty(paths{ff})
+        if ischar(paths{ff})
+            C{idx1} = sprintf('%s = ''%s'';', fields{ff}, paths{ff});
+        elseif isnumeric(paths{ff})
+            C{idx1} = sprintf('%s = %d;', fields{ff}, paths{ff});
+        end
     end
+    % looks for function names
+    idx2 = find(contains(C,['function ' fields{ff}]));
+    if ~isempty(idx2) && ~isempty(paths{ff})
+        C{idx2} = ['function ' paths{ff}];
+    end    
 end
 
 %% Overwrite the file

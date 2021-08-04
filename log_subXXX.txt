@@ -21,7 +21,7 @@ pathSetup();
 %   This should be consistent with the ID used when renaming this file.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MODIFY HERE! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subid = ''; % e.g.: '001' 
+targ_subid = ''; % e.g.: '001' 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Write here the name (not the path) of the DICOM folder containg the data of this subject.
@@ -30,31 +30,3 @@ subid = ''; % e.g.: '001'
 dcm_subid = ''; % e.g.: 'S01'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% ################      SESSION LEVEL ANALYSIS       #####################
-
-%  [copy and adapt the following code as many times as the number of  ...
-%                              ...  time points available for this subject]
-
-%% Session # XX (adapt this to make it consistent with session ID, e.g.: 01)
-config = setSesConfig(); % don't change this
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MODIFY HERE! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sesid = ''; % This is the ID you want to assigne to this session e.g.: '01'
-config.dcm2nii.dcm_sesID = ''; % This is the dcm folder ID of the session e.g.: 's56454'
-config.dcm2nii.configFile = ''; % This is the config fle for this specific session 
-                                %  e.g.: '/Users/<myUsername>/BIDSconfig.json')
-config.parall = []; % Set the number of cores you want to use for parallel computing. leave empty otherwise.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Let's setup a few things...(don't change this)
-config.sesID = sesid;
-config.dcm2nii.dcm_subID = dcm_subid;
-
-% ...and let's start the analysis !!!
-l = sessionLevelAnalysis(subid, config.sesID, config);
-
-%% ################      SUBHECT LEVEL ANALYSIS       #####################
-
-%  [This part of the code should not be copied multiple times !!]
-
-l = subjectLevelAnalysis();

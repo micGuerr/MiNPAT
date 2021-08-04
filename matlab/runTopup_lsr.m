@@ -1,4 +1,4 @@
-function [status] = runTopup_lsr(all_b0s_path, acqp_file, b0, cnf, baseName, rfield, unwarp_b0)
+function [status, result] = runTopup_lsr(all_b0s_path, acqp_file, b0, cnf, baseName, rfield, unwarp_b0)
 % 
 % Runs FSL's topup utility using "Least-Squares Restoration" method to
 % combine and correct for EPI disortion the b0 iamges
@@ -30,6 +30,7 @@ out_topup = [baseName '_fieldcoef.nii.gz'];
 if exist(out_topup, 'file')
     warning('It seems topup has been already run. Deleate the existing files if you want to re-run this analysis');
     status = 0;
+    result = '';
     return
 end
 
@@ -54,7 +55,9 @@ topup_cmd = ['topup --imain='  all_b0s_path, ...
 [topup_stat,topup_res] = runSystemCmd(topup_cmd, 1);
 
 if topup_stat
-    error(topup_res)
+    status = topup_stat;
+    result = topup_res;
+    return
 end
     
 %% Correct the b0 images
@@ -83,7 +86,13 @@ apply_cmd = ['applytopup -i '  b0_list, ...
     ' -t ' baseName , ...
     ' -o ' unwarp_b0];
 
-[status,apply_res] = runSystemCmd(apply_cmd, 1);
+[apply_stat,apply_res] = runSystemCmd(apply_cmd, 1);
+
+%% Update status and result of the step
+
+status = ~(~topup_stat * ~apply_stat);
+result = sprintf('%s\n%s',topup_res, apply_res);
+
 
 
 

@@ -1,4 +1,4 @@
-function [eddy_dwi, eddy_bval, eddy_bvec, status] = runEddy(dwiData, topup, mask, acqp_file, baseName)
+function [eddy_dwi, eddy_bval, eddy_bvec, status] = runEddy(dwiData, topup, mask, acqp_file, baseName, logFile)
 % 
 % Runs FSL's Eddy
 %
@@ -19,6 +19,9 @@ function [eddy_dwi, eddy_bval, eddy_bvec, status] = runEddy(dwiData, topup, mask
 % 
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+%% Assigne a step title
+stepTitle = 'EDDY';
 
 %% First thing, let's parse the DWI acquisition information. 
 %  Let's check everything needed is there.
@@ -55,7 +58,7 @@ all_dwis_path = sprintf('%s_allDwis.nii.gz', baseName);
 all_bval_path = sprintf('%s_allBval.bval', baseName);
 all_bvec_path = sprintf('%s_allBvec.bvec', baseName);
 
-[mrg_status, mrg_res] = mergeDwiData(dwiData, all_dwis_path, all_bval_path, all_bvec_path);
+[mrg_stat, mrg_res] = mergeDwiData(dwiData, all_dwis_path, all_bval_path, all_bvec_path);
 
 
 %% Now let's define the idx file. This should have an index correpsonding 
@@ -81,7 +84,7 @@ eddy_bval = sprintf('%s.eddy_out_bvals', baseName);
 is_eq = isSameProtcol(dwiData);
 
 % If everything is equal then use "Least-Squares Restoration".
-[status, result] = runEddyCmd(all_dwis_path, all_bval_path, all_bvec_path, mask, ...
+[eddy_stat, eddy_res] = runEddyCmd(all_dwis_path, all_bval_path, all_bvec_path, mask, ...
                                 acqp_file, idx_path, topup, ...
                                     is_eq, baseName);
 
@@ -95,3 +98,17 @@ acqs = fieldnames(dwiData);
 matchEddyBvalsBvecs(is_eq, dwiData.(acqs{1}).bval, all_bval_path, ...
                                     baseName, eddy_bval, eddy_bvec);
 
+                                
+%% log the result and check the status
+
+% Update status and result of the step
+status = ~(~mrg_stat * ~eddy_stat);
+result = sprintf('%s\n%s',mrg_res, eddy_res);
+
+% Log the result into a log file
+logResult(stepTitle, result, logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+end

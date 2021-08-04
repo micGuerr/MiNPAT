@@ -19,7 +19,7 @@ exp_output = [eddy_out '.nii.gz'];
 if exist(exp_output, 'file')
     warning('It seems Eddy command has already been run. Delate the existing ouput if you would like to repeat the analysis');
     status = 0;
-    result = 0;
+    result = '';
     return
 end
 

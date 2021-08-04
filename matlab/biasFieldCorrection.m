@@ -22,6 +22,9 @@ function [bfcData, status] = biasFieldCorrection(biasedData)
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
+%% Assigne a step title
+stepTitle = 'Bias field correction';
+
 %% First check the input structure fields
 
 % there should be a field named t1w
@@ -67,7 +70,7 @@ if ~exist(bfcData.t1w, 'file')
                                ' --noReorient'];
 
         % run the bfc
-        status = runSystemCmd(bfc_cmd, 1); 
+        [status, result] = runSystemCmd(bfc_cmd, 1); 
     end
 else
     % need to return the t2w output name anyway
@@ -78,5 +81,16 @@ else
     end
     warning('file %s already exist. If you want to carry on with the analysis, consider change name of already existing file or remove it.', ...
         bfcData.t1w);
-    status = 2;
+    status = 0;
+    result = '';
+end
+
+%% log the result and check the status
+
+% Log the result into a log file
+logResult(stepTitle, result, logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end

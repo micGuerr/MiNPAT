@@ -1,4 +1,4 @@
-function [I, status] = getDwiAnalysisInput(rawDataDir, fileList, wrkDirPath, subID, sesID)
+function [I, status, result] = getDwiAnalysisInput(rawDataDir, fileList, wrkDirPath, subID, sesID)
 %
 % 1. Identifies the input files for diffusion analysis, given the file
 %    list from the raw data folder.
@@ -50,6 +50,10 @@ end
 %% Now store the files as diffusion analysis input and create a soft-link 
 %  to the session level analysis folder
 
+% initialize status and result of the process
+status = 0;
+result = '';
+
 % supported diffusion MR image types currently include:
 strct_typ = {'dwi'};
 
@@ -96,19 +100,21 @@ for ii = 1:length(idx)
             if ~exist(dwiVol, 'file') && ~exist(dwiBval, 'file') ...
                     && ~exist(dwiBvec, 'file') && ~exist(dwiSc, 'file')
                 % link the diffusion data
-                st1 = ln_files(vol_fullPath, dwiVol);
+                [st1, res1] = ln_files(vol_fullPath, dwiVol);
                 % link the bvalues
-                st2 = ln_files(vol_bval, dwiBval);
+                [st2, res2] = ln_files(vol_bval, dwiBval);
                 % link the bvecs
-                st3 = ln_files(vol_bvec, dwiBvec);
+                [st3, res3] = ln_files(vol_bvec, dwiBvec);
                 % link the sidecar file
-                st4 = ln_files(vol_sc, dwiSc);
+                [st4, res4] = ln_files(vol_sc, dwiSc);
                 % final status
-                status = ~(~st1 * ~st2 * ~st3 * ~st4);
+                tmp_stat = ~(~st1 * ~st2 * ~st3 * ~st4);
+                tmp_res = sprintf('%s\n%s\n%s\n%s\n', res1, res2, res3, res4);
             else
                 warning('The diffusion data, b-values, bvecs or sideCar file referred to input %s, already exist', ...
                     dwiVol);
-                status = 0;
+                tmp_stat = 0;
+                tmp_res = '';
             end
             
             % Define this specific acquisition field ID
@@ -118,6 +124,11 @@ for ii = 1:length(idx)
             I.(acqID).bval = dwiBval;
             I.(acqID).bvec = dwiBvec;
             I.(acqID).sc = dwiSc;
+            
+            % update status and result
+            status = ~(~status * ~tmp_stat);
+            result = sprintf('%s\n%s',result, tmp_res);
+
         end
     end 
 end

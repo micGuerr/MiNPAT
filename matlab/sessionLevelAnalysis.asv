@@ -23,6 +23,7 @@ function status = sessionLevelAnalysis(config)
 %% Call the GLOBAL variables
 
 global DICOMDIR RAWDIR SUBANDIR SUBJECTS_DIR
+global FSLDIR
 
 %% Define some important variables
 
@@ -39,41 +40,43 @@ n_cores = config.parall;
 %% STEP 0.      DICOM TO NIfTI CONVERSION
 
 % Do the conversion
-[config.dcm2nii.outc] = dcm2nii(DICOMDIR, dcm_subID, dcm_sesID, dcm2nii_configFile, ...
+[config.dcm2nii.outc, ...
+    config.dcm2nii.expFileList] = dcm2nii(DICOMDIR, dcm_subID, dcm_sesID, dcm2nii_configFile, ...
                                 RAWDIR, subID, sesID, logFile);
 
-% Get the list of converted raw data 
-config.dcm2nii.expFileList = getExpectedFileList(dcm2nii_configFile, subID, sesID);
-
-if ~config.dcm2nii.outc
-% run QC
-    config.dcm2nii.qc.outc = qcRawData(RAWDIR, subID, sesID, dcm2nii_configFile, dxc2nii_exclCriter);
-end
+%  run QC
+config.dcm2nii.qc.outc = qcRawData(RAWDIR, subID, sesID, dcm2nii_configFile, dxc2nii_exclCriter);
 
 pauseProcess('DICOM TO NIfTI CONVERSION');
 
 %% STEP 1.      ANATOMICAL ANALYSIS
 %% Step 1.0     Folder structure and inputs definition
 
-% Create the folders for this anatomical session level analysis.
+% Create the folders for this anatomical session level analysis and
+% Define the inputs for anatomical analysis.
 [config.anat.path, ...
-    config.anat.outc] = define_sesLevl_path(SUBANDIR, subID, sesID, 'anat');
+    config.anat.input, ...
+       config.anat.outc] = getSesLevelAnalysisInput(RAWDIR, config.dcm2nii.expFileList, ...
+                                                        SUBANDIR, subID, sesID, 'anat', ...
+                                                            logFile);
 
-% Define the inputs for anatomical analysis
-config.anat.input = getSesLevelAnalysisInput(RAWDIR, config.dcm2nii.expFileList, ...
-                        config.anat.path, subID, sesID, 'anat');
+pauseProcess('Anatomical folder structure and inputs definition');
 
 %% Step 1.1     Anatomical data preparation
 
 % Reorient to match FSL template orientation and crop the FOV.
 [config.anat.reor.outp, ...
-    config.anat.reor.outc] = anatDataPrep(config.anat.input);
+    config.anat.reor.outc] = anatDataPrep(config.anat.input, logFile);
+
+pauseProcess('Anatomical data preparation');
 
 %% Step 1.2     Bias field correction
 
 % Run the bias field correction
 [config.anat.bfc.outp, ...
-    config.anat.bfc.outc] = biasFieldCorrection(config.anat.reor.outp);
+    config.anat.bfc.outc] = biasFieldCorrection(config.anat.reor.outp, logFile);
+
+pauseProcess('Bias field correction');
 
 %% Step 1.3     FreeSurfer (FS) analysis
 
@@ -82,41 +85,54 @@ config.anat.fs.ID = sprintf('sub-%s_ses-%s', subID, sesID);
 % Run the FreeSurfer analysis
 config.anat.fs.outc = runFreeSufer(config.anat.bfc.outp, ...
                         SUBJECTS_DIR, config.anat.fs.ID, ...
-                            n_cores);
-    
+                            n_cores, logFile);
+
+pauseProcess('FreeSurfer (FS) analysis');
+
 %% Step 1.4     Anatomical brain mask definition
 
 % Define a fine brain mask for anatomical data
 [config.anat.bm.outp, ...
-    config.anat.bm.outc] = define_anatBrainMask(config.anat.fs.ID, config.anat.bfc.outp);
+    config.anat.bm.outc] = define_anatBrainMask(config.anat.fs.ID, config.anat.bfc.outp, logFile);
+
+pauseProcess('Anatomical brain mask definition');
 
 %% STEP 2.      DIFFUSION ANALYSIS
 %% Step 2.0     Folder structure and inputs definition
 
-% Create the folders for this diffusion session level analysis.
-[config.dwi.path, config.dwi.outc] = define_sesLevl_path(SUBANDIR, subID, sesID, 'dwi');
+% Create the folders for this anatomical session level analysis and
+% Define the inputs for anatomical analysis.
+[config.dwi.path, ...
+    config.dwi.input, ...
+       config.dwi.outc] = getSesLevelAnalysisInput(RAWDIR, config.dcm2nii.expFileList, ...
+                                                        SUBANDIR, subID, sesID, 'dwi', ...
+                                                            logFile);
 
-% Define the inputs for diffusion analysis
-config.dwi.input = getSesLevelAnalysisInput(RAWDIR, config.dcm2nii.expFileList, ...
-                        config.dwi.path, subID, sesID, 'dwi');
+pauseProcess('Diffusion folder structure and inputs definition');
 
 %% Step 2.1     Run topup
 config.dwi.topup.bsname = fullfile(config.dwi.path, 'topup', 'topup');
+config.dwi.topup.cnfg = fullfile(FSLDIR,'src','topup','flirtsch','b02b0.cnf');
+
 
 [config.dwi.topup.field, ...
     config.dwi.topup.b0unwrp, ...
         config.dwi.topup.acqp, ...
             config.dwi.topup.outc] = runTopup(config.dwi.input, ...
                                             config.dwi.topup.cnfg, ...
-                                                config.dwi.topup.bsname);
-                                            
+                                                config.dwi.topup.bsname, logFile);
+
+pauseProcess('TOPUP');
+
 %% Step 2.2     Rough diffusion brain mask definition
 
 config.dwi.bet.outpath = fullfile(config.dwi.path, 'bet');
 
 [~, config.dwi.bet.mask, ...
     config.dwi.bet.outc] = runBET(config.dwi.topup.bsname, config.dwi.bet.outpath, ...
-                                config.dwi.bet.f);
+                                config.dwi.bet.f, logFile);
+
+pauseProcess('Rough Brain Extaction');
 
 %% Step 2.3     Run EDDY
 
@@ -130,7 +146,9 @@ config.dwi.eddy.bsname = fullfile(config.dwi.path, 'eddy', 'eddycorr');
                                             config.dwi.bet.mask, ...
                                                 config.dwi.topup.acqp, ...
                                                     config.dwi.eddy.bsname);
-                                                
+
+pauseProcess('EDDY');
+
 %% Step 2.4     Run DTI fit
 
 config.dwi.dti.outpath = fullfile(config.dwi.path, 'dti', 'dti');

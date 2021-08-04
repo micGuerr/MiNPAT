@@ -1,4 +1,4 @@
-function [dti, status] = runDTIfit(dwi, bval, bvec, mask, outpath)
+function [dti, status] = runDTIfit(dwi, bval, bvec, mask, outpath, logFile)
 % 
 % Runs FSL's DTIFIT
 %
@@ -19,6 +19,9 @@ function [dti, status] = runDTIfit(dwi, bval, bvec, mask, outpath)
 % 
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+%% Assigne a step title
+stepTitle = 'DTI FIT';
 
 %% First, let's check all the input file exist
 
@@ -66,3 +69,13 @@ dtiInPath = fullfile(dtiDir, 'inputData', 'lt_1500_dwi');
 % Run the commnad
 [dti, status, result] = runDTIfit_cmd(dti_in_dwi, dti_in_bval, dti_in_bvec, mask, outpath);
 
+
+%% log the result and check the status
+
+% Log the result into a log file
+logResult(stepTitle, result, logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+end

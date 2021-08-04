@@ -1,4 +1,4 @@
-function [status] = runFreeSufer(anatData,fsDir ,fsID, nCores)
+function [status] = runFreeSufer(anatData, fsDir ,fsID, nCores, logFile)
 % 
 % Runs freeSurfer analysis
 %
@@ -66,5 +66,23 @@ if ~exist(fsOutput, 'file')
 else
     warning('FreeSurfer output for ID %s already exist. If you want to carry on with the analysis, consider changing name of the subject folder already  or remove it', ...
         fsID);
-    status = 2;
+    status = 0;
+end
+
+%% log the result and check the status
+
+% Istead of writing the result on logfile, copy the logFile from FS
+% analysis
+
+% the new file is
+[logFile_path, logFile_name] =fileparts(logFile);
+fs_logFile = fullfile(logFile_path, sprintf('%s_fs.txt', logFile_name));
+% the original log file is
+orig_fsLogFile = fullfile(fsDir ,fsID, 'scripts', 'recon-all.log');
+% copy the log file
+copyfile(orig_fsLogFile, fs_logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end

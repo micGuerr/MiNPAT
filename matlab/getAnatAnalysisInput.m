@@ -1,4 +1,4 @@
-function [I, status] = getAnatAnalysisInput(rawDataDir, fileList, wrkDirPath, subID, sesID)
+function [I, status, result] = getAnatAnalysisInput(rawDataDir, fileList, wrkDirPath, subID, sesID)
 %
 % 1. Identifies the input files for anatomical analysis, given the file
 %    list from the raw data folder.
@@ -50,6 +50,10 @@ end
 %% Now store the files as anotomical analysis input and create a soft-link 
 %  to the session level analysis folder
 
+% initialize status and result of the process
+status = 0;
+result = '';
+
 % supported non-parametric structural MR image types currently include:
 strct_typ = {'t1w', 't2w'};
 
@@ -57,7 +61,6 @@ strct_typ = {'t1w', 't2w'};
 for ii = 1:length(idx)
     % use sc to track presence of SideCar files
     sc = 0; % initialize to zero
-    status_sc = 0; % status is set to 0 (everything is OK)
     
     %% Need to extract the file type from the file name. Also look for sideCar files
     % take the filename
@@ -88,10 +91,11 @@ for ii = 1:length(idx)
             % Instead of copying the file, to save space, create a link
             % But first check if the file already exist
             if ~exist(anatInput, 'file')
-                ln_files(vol_fullPath, anatInput);
+                [tmp_stat, tmp_res] = ln_files(vol_fullPath, anatInput);
             else
                 warning('File %s already exist',anatInput);
-                status = 0;
+                tmp_stat = 0;
+                tmp_res = '';
             end
             
             % Assigne the value to the output structue
@@ -103,20 +107,25 @@ for ii = 1:length(idx)
                 anatInput_sc = fullfile(anatDir, [vol_name, '.json']);
                 % If it not already there creat the link
                 if ~exist(anatInput_sc, 'file')
-                    ln_files(vol_sc, anatInput_sc);
+                    [status_sc, result_sc] = ln_files(vol_sc, anatInput_sc);
                 else
                     warning('File %s already exist',anatInput_sc);
                     status_sc = 0;
+                    result_sc = '';
                 end
                 
                 % Assigne the value to the output structue
                 I.([strct_typ{jj} '_sc']) = anatInput_sc;
+                
+                % update status and result
+                tmp_stat = ~(~tmp_stat * ~status_sc);
+                tmp_res = sprintf('%s\n%s',tmp_res, result_sc);
             end
             
-            % Check whether the linking process gave positive results
-             if ~status_sc
-                 status = status_sc;
-             end
+            % update status and result
+            status = ~(~status * ~tmp_stat);
+            result = sprintf('%s\n%s',result, tmp_res);
+
         end
     end 
 end

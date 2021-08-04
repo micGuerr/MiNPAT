@@ -58,7 +58,7 @@ result = sprintf('%s\n%s',result, tmp_res);
 logResult(stepTitle, result, logFile);
 
 % Check process status, output an error if something didn't work
-if ~status
+if status
     error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end
 

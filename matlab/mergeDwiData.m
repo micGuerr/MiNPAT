@@ -1,4 +1,4 @@
-function [cmd_status, cmd_res] = mergeDwiData(dwiStruct, mrgd_dwis, mrgd_bval, mrgd_bvec)
+function [status, result] = mergeDwiData(dwiStruct, mrgd_dwis, mrgd_bval, mrgd_bvec)
 % 
 % 
 % 
@@ -16,8 +16,8 @@ function [cmd_status, cmd_res] = mergeDwiData(dwiStruct, mrgd_dwis, mrgd_bval, m
 %% First check the output doesn't exist
 if exist(mrgd_dwis, 'file')
     warning('File %s already exist, DWI stack NOT merged.', mrgd_dwis);
-    cmd_status = 0;
-    cmd_res = 0;
+    status = 0;
+    result = '';
     return
 end
 
@@ -65,7 +65,7 @@ end
 
 % Run the merging command
 mrg_cmd = sprintf('fslmerge -t %s %s', mrgd_dwis, tmp_dwi);
-[cmd_status, cmd_res] = runSystemCmd(mrg_cmd, 1);
+[status, result] = runSystemCmd(mrg_cmd, 1);
 
 % Get the bval/bvec files
 if doBval; mk_bvalFile(bval, mrgd_bval); end

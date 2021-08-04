@@ -25,6 +25,8 @@ dti.sse = sprintf('%s_sse.nii.gz', outpath);
 
 if exist(dti.MD, 'file')
     warning('File %s already exist, DTIFIT didn''t run.', dti.MD);
+    status = 0;
+    result = '';
     return
 end
 

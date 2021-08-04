@@ -1,4 +1,4 @@
-function [brain, mask, status] = runBET(b0_file, out_dir, f)
+function [brain, mask, status] = runBET(b0_file, out_dir, f, logFile)
 % 
 % Runs FSL's BET
 %
@@ -21,6 +21,9 @@ function [brain, mask, status] = runBET(b0_file, out_dir, f)
 % 
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+%% Assigne a step title
+stepTitle = 'Rough brain extraction';
 
 %% First check if the output folder exists, if not create it.
 
@@ -47,6 +50,19 @@ end
 brain = fullfile(out_dir, sprintf('%s_brain.nii.gz', b0_name));
 mask = fullfile(out_dir, sprintf('%s_brain_mask.nii.gz', b0_name));
 
-
 % Run bet command
-[status] = runBet_cmd(in_bet, brain, f);
+[bet_stat, bet_res] = runBet_cmd(in_bet, brain, f);
+
+%% log the result and check the status
+
+% Update status and result of the step
+status = ~(~tmean_stat * ~bet_stat);
+result = sprintf('%s\n%s',tmean_res, bet_res);
+
+% Log the result into a log file
+logResult(stepTitle, result, logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+end

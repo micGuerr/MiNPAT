@@ -14,8 +14,8 @@ farrm_dt = struct();
 dt_names = fieldnames(dti);
 
 %
-status = 1;
-result = [];
+status = 0;
+result = '';
 
 for ii = 1:length(dt_names)
     % parse input names and create a new corresponding output name
@@ -32,11 +32,12 @@ for ii = 1:length(dt_names)
     
     % define the command to mask the input
     mask_cmd = sprintf('fslmaths %s -mas %s %s', tmp_in_dt, farrm_mask, tmp_out_farrm);
-    [tmp_status, result] = runSystemCmd(mask_cmd, 1);
+    [tmp_stat, tmp_res] = runSystemCmd(mask_cmd, 1);
     
     % Assign the new file to the output structure
     farrm_dt.(dt_names{ii}) = tmp_out_farrm;
     
-    % update the status
-    status = status*tmp_status;
+    % Update status and result of the step
+    status = ~(~status * ~tmp_stat);
+    result = sprintf('%s\n%s',result, tmp_res);
 end

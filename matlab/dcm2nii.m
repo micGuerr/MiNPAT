@@ -54,6 +54,7 @@ elseif iscell(dcm_sesID) % if cell, assumes multiple folders for this timepoint
         inDicom = fullfile(dcmdir_path, dcm_subID, dcm_sesID{ii});
         % Run Conversion
         [tmp_status, tmp_result] = dcmConvert(inDicom, subID, sesID, configFile, outpdir_path);
+        % Update status and result of the step
         status = ~(~status * ~tmp_status);
         result = sprintf('%s\n%s',result, tmp_result);
     end
@@ -73,6 +74,6 @@ fileList = getExpectedFileList(configFile, subID, sesID);
 logResult(stepTitle, result, logFile);
 
 % Check process status, output an error if something didn't work
-if ~status
+if status
     error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end

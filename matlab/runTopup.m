@@ -1,4 +1,4 @@
-function [rfield, unwarp_b0, acqp_file, status] = runTopup(dwiData, config, baseName)
+function [rfield, unwarp_b0, acqp_file, status] = runTopup(dwiData, config, baseName, logFile)
 % 
 % Runs FSL's topup utility
 %
@@ -20,18 +20,13 @@ function [rfield, unwarp_b0, acqp_file, status] = runTopup(dwiData, config, base
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
-global FSLPATH
+%% Assigne a step title
+stepTitle = 'TOPUP';
 
 %% First thing, let's parse the DWI acquisition information. 
 %  Let's check everything needed is there.
 
 CheckDwiDataFields(dwiData)
-
-
-% Let's also check if topup configuration file is input. If not use default
-if isempty(config)
-    config = fullfile(FSLPATH,'src','topup','flirtsch','b02b0.cnf');
-end
 
 %% Next, check the output folder exists. If not create it
 
@@ -52,7 +47,7 @@ b0 = getTopupB0s(dwiData, topupDir);
 all_b0s_path = fullfile(topupDir, 'all_b0.nii.gz');
 
 % merge the b0s
-[mrg_cmd, mrg_status] = mergeDwiData(b0, all_b0s_path, [], []);
+[mrg_stat, mrg_res] = mergeDwiData(b0, all_b0s_path, [], []);
 
 %% Now let's put the acquisition parameters in a file
 
@@ -77,12 +72,25 @@ is_eq = isSameProtcol(dwiData);
 
 if is_eq
     % If everything is equal then use "Least-Squares Restoration".
-    [status] = runTopup_lsr(all_b0s_path, acqp_file, b0, config, baseName, rfield, unwarp_b0);
+    [topup_stat,topup_res] = runTopup_lsr(all_b0s_path, acqp_file, b0, config, baseName, rfield, unwarp_b0);
 else
     % else use Jacobian method
-    [status] = runTopup_jac(all_b0s_path, acqp_file, config, baseName, rfield, unwarp_b0);
+    [topup_stat,topup_res] = runTopup_jac(all_b0s_path, acqp_file, config, baseName, rfield, unwarp_b0);
 end
 
+%% log the result and check the status
+
+% Update status and result of the step
+status = ~(~topup_stat * ~mrg_stat);
+result = sprintf('%s\n%s',topup_res, mrg_res);
+
+% Log the result into a log file
+logResult(stepTitle, result, logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+end
 
 
 

@@ -1,4 +1,4 @@
-function [status] = runTopup_jac(all_b0s_path, acqp_file, cnf, baseName, rfield, unwarp_b0)
+function [status, result] = runTopup_jac(all_b0s_path, acqp_file, cnf, baseName, rfield, unwarp_b0)
 % 
 % Runs FSL's topup utility using "jacobian modulation" method to
 % combine and correct for EPI disortion the b0 iamges
@@ -28,6 +28,8 @@ out_topup = [baseName '_fieldcoef.nii.gz'];
 
 if exist(out_topup, 'file')
     warning('It seems topup has been already run. Deleate the existing files if you want to re-run this analysis');
+    status = 0;
+    result = '';
     return
 end
 
@@ -50,7 +52,7 @@ topup_cmd = ['topup --imain='  all_b0s_path, ...
                    ' --verbose'];
 
 % Run the command
-[status,topup_res] = runSystemCmd(topup_cmd, 1);
+[status,result] = runSystemCmd(topup_cmd, 1);
 
 
 

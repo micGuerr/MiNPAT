@@ -1,4 +1,4 @@
-function [prepData, status] = anatDataPrep(anatData)
+function [prepData, status] = anatDataPrep(anatData, logFile)
 % 
 % Prepares data for anatomcial analysis.
 % 1. Reorient anatomical images to FSL template.
@@ -22,6 +22,9 @@ function [prepData, status] = anatDataPrep(anatData)
 % 
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
+
+%% Assigne a step title
+stepTitle = 'Anatomical data preparation';
 
 %% First check the input structure fields
 
@@ -52,11 +55,12 @@ if ~exist(prepData.t1w, 'file')
         ' --out=' prepData.t1w];
     
     % Run the command
-    status = runSystemCmd(t1w_prep_cmd, 1);
+    [status, result] = runSystemCmd(t1w_prep_cmd, 1);
 else
     warning('file %s already exist. If you want to carry on with the analysis, consider change name of already existing file or remove it', ...
         prepData.t1w);
-    status = 2;
+    status = 0;
+    result = '';
 end
 %% If available, repeat the command for the T2w image
 
@@ -72,11 +76,27 @@ if t2w
                                   ' --t2w'];
     
     % Run the command
-        t2w_status = runSystemCmd(t2w_prep_cmd, 1);
-        status = status + t2w_status;
+        [t2w_stat, t2w_res] = runSystemCmd(t2w_prep_cmd, 1);
     else
         warning('file %s already exist. If you want to carry on with the analysis, consider change name of already existing file or remove it.', ...
             prepData.t2w);
-        status = 2;
+        t2w_stat = 0;
+        t2w_res = '';
     end
+    
+    % Update status and result of the step
+    status = ~(~status * ~t2w_stat);
+    result = sprintf('%s\n%s',result, t2w_res);
+
+end
+
+
+%% log the result and check the status
+
+% Log the result into a log file
+logResult(stepTitle, result, logFile);
+
+% Check process status, output an error if something didn't work
+if status
+    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end

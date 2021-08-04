@@ -13,7 +13,7 @@ MiNPAT offers a framework for the data analysis. For this reason it requires a m
 
 ## Output
 
-MiNPAT computes imaging features form the diffusion data (such as DTI and NODDI) as well as finding correspondence between time points and subjects. Different types of correspondence can be obtained via MiNPAT:
+MiNPAT computes imaging features form the diffusion data, *aka* image derived phenotypes, (such as DTI and NODDI) as well as finding correspondence between time points and subjects. Different types of correspondence can be obtained via MiNPAT:
 
 * White matter (WM) spatial correspondece, optimaized for WM tracts analysis.
 * Cortical surface spatial correspondece, optimaized for cortical gray matter (GM) analysis.

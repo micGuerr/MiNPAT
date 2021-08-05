@@ -1,4 +1,4 @@
-function [bfcData, status] = biasFieldCorrection(biasedData)
+function [bfcData, status] = biasFieldCorrection(biasedData, logFile)
 % 
 % Correct anatomical data for bias field inhomogeneities. If available it
 % uses both a T1w and a T2w image.

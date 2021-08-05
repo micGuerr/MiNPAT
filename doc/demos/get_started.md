@@ -115,32 +115,42 @@ If this is the case you can use the following command:
 ```matlab
 startNewSesAnalysis('001', '01', 'S01', {'s12345a', 's12345b', 's12345c'}, '/Users/<username>/myBIDSconfigFile.json', {'localizer', 'noise'}, 4);
 ```
-where `s12345a`, `s12345b`, `s12345c` are the names of the folders containing the specific session DICOM data.
+where `s12345a`, `s12345b`, `s12345c` are the names of the folders containing that specific session DICOM data.
 
-1. First, you need to create a copy of the template file `<path_to_new_project_folder>/logs/log_subXXX.txt`. **A new copy will be needed every time you want to analyze a new subject**. This file will store all the steps of the session and subject level analysis which will be performed for that specific subject. 
-    * You should copy the file in the very same folder (`<path_to_new_project_folder>/log`).
-    * You should change the file extension from *.txt* to *.m*.
-    * You should modify the file name so to include a **unique ID for that subject**.
+### Output
 
-Assuming the subject ID is `001`, the command from terminal would be:
+This step creates the following folders and files into the folder structure previously created by the `startNewProcessing()` function:
+
 ```bash
-mv <path_to_new_project_folder>/log/log_subXXX.txt <path_to_new_project_folder>/log/log_sub001.m
+<path_to_new_project_folder>
+├── config/
+├── dataAnalysis/
+├── dataProcessing/
+├── logs/
+    └── sub-<subID>/
+        ├── ses-<sesID>
+        │   └── sub-<subID>_ses-<sesID>_log.txt
+        └── log_sub<subID>.m
 ```
 
-2. Next, from Matlab, open the newly created file (` <path_to_new_project_folder>/log/log_sub001.m` in the example) and modify the following components:
-    * Modify the function name (1st line) consistently with the name assigned to the file: e.g. `function log_subXXX()` ==> `function log_sub001()`.
-    * Define the subject ID, consistently with the one used to name the file (line 24): e.g. `subid = '001';`.
-    * Add the name of the folder (NOT the path to the folder) containing the subject DICOM data (line 30): e.g. `dcm_subid = 'S01';`.
-    * Insert the number of cores you would like to use in your analysis...
+* `<path_to_new_project_folder>/logs/sub-<subID>/`: It creates a specific folder for the target subject, using the input subject ID.
+* `<path_to_new_project_folder>/logs/sub-<subID>/ses-<sesID>/`:It creates a specific folder for the target session, using the input session ID.
+* `<path_to_new_project_folder>/logs/sub-<subID>/log_sub<subID>.m`: It is a matlab function which will be used to run the specific session and subject level analysis. It also serves as log file f the analysis, since all the deviation form standard processing should be recorded there.
+* `<path_to_new_project_folder>/logs/sub-<subID>/ses-<sesID>/sub-<subID>_ses-<sesID>_log.txt`:It is an empty text file which will store all the standard outputs from the different tools used in the analysis.
 
-3. In the same file, duplicate the session level analysis (from line 38 to line 57) as many times as the number of session available for that specific subject. Modify the following components:
-    * Assigne each session an ID (line 42): e.g. `sesid = '01';`.
-    * Add the name of the folder (NOT the path to the folder) containing the session DICOM data (line 43): e.g. `config.dcm2nii.dcm_sesID = 's12345';`.
-    * Add the path to the *.json* configuration file for that specific session (line 44): e.g. `config.dcm2nii.configFile = '/Users/<username>/myBIDSconfigFile.json';`.
-    * ...
-    * Modify the comment line labeling the new session analysis consistently with the ID you used (line 41): e.g. `%% Session # XX` ==> `%% Session # 01`.
+### Setup a new session analysis on the same subject
 
-4. [Work in progress... At the end of the file, input the session IDs you used into the `subjectLevelAnalysis()` function so to run the session level analsysis taking into account all teh session .].
+In order for you to setup the analysis of a different session on the same subject, you will simply need to re-run the `startNewSesAnalysis()` funtion using the same subject ID, but assigning a new session ID and changing consistently the other inputs.
+
+This command will add a new chunck of code to the `<path_to_new_project_folder>/logs/sub-<subID>/log_sub<subID>.m` file.
+
+## Setup a subject level analysis
+
+Once you processes all the time points of a subject, you will e able to run the [subject levle analysis](). You can do this via the function `startSubLevelAnalysis()`.
+
+### Input
+
+### Output
 
 
 You are now ready to run the session/subject level analysis. Check out the [run session level analysis](runSesLevelAn.md) and [run subject level analysis](runSubLevelAn.md) sections for more info.

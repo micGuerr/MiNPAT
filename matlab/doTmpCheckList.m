@@ -56,11 +56,11 @@ if isempty(tmpList)
     check = 1;
 elseif ~isempty(tmpList) && isempty(fOmit)
     fList = cell(nF,2);
-    check = 0;
+    check = 1;
     for ii = 1:nF
         % file name and path must be concatenated
         fList{ii,1} = fullfile(fullPath,tmpList(ii).name);
-        fList{ii,2} = 0;
+        fList{ii,2} = 1;
     end
 else
     fList = cell(nF,2);

@@ -39,6 +39,14 @@ for ff = 1 : n_fields
             C{idx1} = sprintf('%s = ''%s'';', fields{ff}, paths{ff});
         elseif isnumeric(paths{ff})
             C{idx1} = sprintf('%s = %d;', fields{ff}, paths{ff});
+        elseif iscell(paths{ff})
+            n_cells = length(paths{ff});
+            tmp_str = '{';
+            for jj = 1:n_cells
+                tmp_str = strcat(tmp_str , '''', paths{ff}{jj}, '''', ',');
+            end
+            tmp_str = strcat(tmp_str(1:end-1), '}');
+            C{idx1} = sprintf('%s = %s;', fields{ff}, tmp_str);
         end
     end
     % looks for function names

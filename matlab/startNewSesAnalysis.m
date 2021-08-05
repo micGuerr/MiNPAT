@@ -100,9 +100,8 @@ logSes_source = fullfile(MINPAT, 'log_sesLevelAn.txt');
 % define the output name
 logSes_dest = fullfile(log_dir, 'tmp_logSesFile.m');
 % create hte file if it doesn't exist
-if ~exist(logSes_dest, 'file')
-    copyfile(logSes_source, logSes_dest);
-end
+copyfile(logSes_source, logSes_dest);
+
 
 %% Make some changes to the file
 
@@ -115,16 +114,6 @@ update_pathSetup(logSes_dest, {'targ_sesid', 'dcm_sesid', 'dcm2nii_configFile', 
                     {sesID, dcm_sesID, dcm2nii_configFile, dxc2nii_exclCriter, n_cores} );
 
 
-                
-%% Concatenate the session level analysis part to the log_subXXX file
-
-% conatenate files
-cat_cmd = sprintf('cat %s >> %s', logSes_dest, logSub_dest);
-runSystemCmd(cat_cmd, 1);
-
-% remove the file
-delete(logSes_dest);
-
 %% Create log text file to store progresses of the session level analysis
 
 log_sesLevelAn_file = fullfile(ses_dir, sprintf('sub-%s_ses-%s_log.txt',subID, sesID));
@@ -134,8 +123,19 @@ fclose(fopen(log_sesLevelAn_file, 'w'));
 %% update field in the log_subXXX.m file
 
 % change the fields
-update_pathSetup(logSub_dest, {'logFile'}, ... 
+update_pathSetup(logSes_dest, {'logFile'}, ... 
                     {log_sesLevelAn_file} );
+
+
+                
+%% Concatenate the session level analysis part to the log_subXXX file
+
+% conatenate files
+cat_cmd = sprintf('cat %s >> %s', logSes_dest, logSub_dest);
+runSystemCmd(cat_cmd, 1);
+
+% remove the file
+delete(logSes_dest);
 
                 
 %% Update the paths

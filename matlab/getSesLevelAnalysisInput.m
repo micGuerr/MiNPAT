@@ -25,7 +25,7 @@ function [stramPath, I, status] = getSesLevelAnalysisInput(rawDataDir, fileList,
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
-%% Assinge a step title
+%% Assign a step title
 
 stepTitle = sprintf('Input and folder struct definition of %s stram', stream);
 
@@ -35,7 +35,7 @@ stepTitle = sprintf('Input and folder struct definition of %s stram', stream);
 [stramPath, status, result] = define_sesLevl_path(subLevlAn_dir, subID, sesID, stream);
 
 
-%% Depending on the selected stram, get the analysis input
+%% Depending on the selected stream, get the analysis input
 
 switch stream
     case 'anat'

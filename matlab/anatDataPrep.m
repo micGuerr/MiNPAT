@@ -39,7 +39,10 @@ if isfield(anatData, 't2w')
     t2w = 1;
 end
 
+
 %% Run the data preparation for T1w image
+fprintf('Reorienting T1w image to AC-PC convention...');
+tic
 
 % define the output as a structure
 prepData = struct();
@@ -55,16 +58,21 @@ if ~exist(prepData.t1w, 'file')
         ' --out=' prepData.t1w];
     
     % Run the command
-    [status, result] = runSystemCmd(t1w_prep_cmd, 1);
+    [status, result] = runSystemCmd(t1w_prep_cmd, 0, 0);
 else
     warning('file %s already exist. If you want to carry on with the analysis, consider change name of already existing file or remove it', ...
         prepData.t1w);
     status = 0;
     result = '';
 end
+fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])
+
 %% If available, repeat the command for the T2w image
 
 if t2w
+    fprintf('Reorienting T2w image to AC-PC convention...');
+    tic
+    
     % define the output name
     [t2w_path, t2w_name] = niftiFileParts(anatData.t2w);
     prepData.t2w = fullfile(t2w_path, sprintf('%s_prep.nii.gz', t2w_name));
@@ -76,7 +84,7 @@ if t2w
                                   ' --t2w'];
     
     % Run the command
-        [t2w_stat, t2w_res] = runSystemCmd(t2w_prep_cmd, 1);
+        [t2w_stat, t2w_res] = runSystemCmd(t2w_prep_cmd, 0, 0);
     else
         warning('file %s already exist. If you want to carry on with the analysis, consider change name of already existing file or remove it.', ...
             prepData.t2w);
@@ -87,9 +95,8 @@ if t2w
     % Update status and result of the step
     status = ~(~status * ~t2w_stat);
     result = sprintf('%s\n%s',result, t2w_res);
-
+    fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])
 end
-
 
 %% log the result and check the status
 

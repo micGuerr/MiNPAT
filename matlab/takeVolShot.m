@@ -52,7 +52,7 @@ end
 
 % Check is slice number should be inserted
 if sliceN
-    L = ' -L ';
+    L = ' -L';
 else
     L = [];
 end
@@ -74,9 +74,8 @@ slicer_cmd = [fullfile(FSLDIR, 'bin', 'slicer ') filename, ...
                 S, ...
                 sprintf(' -%s %.2f ', view, fraction) ...
                 outname];
-
 % Run the command
-runSystemCmd(slicer_cmd, 1);
+runSystemCmd(slicer_cmd, 0, 0);
 
 
 

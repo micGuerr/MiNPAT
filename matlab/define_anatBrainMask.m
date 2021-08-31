@@ -6,7 +6,7 @@ function [bm, status] = define_anatBrainMask(fsPath, anatData)
 %   [bm, status] = define_anatBrainMask(fsPath, anatData)
 % 
 % Inputs:
-%   fsPath      Path to the freesurfe analysis folder for this specific
+%   fsPath      Path to the freesurfer analysis folder for this specific
 %               subject and session.
 %   anatData    structure. It must have at least one field called 't1w', in
 %               which the path to the T1w image is stored.

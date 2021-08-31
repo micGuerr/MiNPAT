@@ -24,6 +24,9 @@ function [I, status, result] = getAnatAnalysisInput(rawDataDir, fileList, wrkDir
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
+fprintf('Creating folder structure and defining inputs for anatomical data...') 
+tic
+
 %% First thing, check if there is any anatomical file into the file list
 
 % Define the path to the rawData anatomical folder
@@ -129,3 +132,5 @@ for ii = 1:length(idx)
         end
     end 
 end
+
+fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])

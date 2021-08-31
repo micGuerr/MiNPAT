@@ -56,6 +56,7 @@ end
 views = {'x', 'y', 'z'};
 viewNames = {'Sagittal', 'Coronal', 'Axial'};
 concat_input = [];
+
 %% REAL JOB
 
 % Loop over the three views
@@ -63,16 +64,16 @@ for ii = 1:3
     % Take the single slice shot
     if v; fprintf('Taking %s slice shot...\n', viewNames{ii}); end
     tmpName = fullfile(outpath, sprintf('tmpSlicer_%s_%s.png', viewNames{ii}, date));
-    takeVolShot(filename, views{ii}, frac(ii), intensity, scale, 1, tmpName)
+    takeVolShot(filename, views{ii}, frac(ii), intensity, scale, 1, tmpName);
     concat_input = [concat_input ' ' tmpName];
 end
 
 conc_cmd = sprintf('h_concat %s %s', outname, concat_input);
-runSystemCmd(conc_cmd, v);
+runSystemCmd(conc_cmd, v, v);
 
 % Remove the temporary file
 rm_cmd = sprintf('rm %s', fullfile(outpath, sprintf('tmpSlicer_*_%s.png', date)));
-runSystemCmd(rm_cmd, v);
+runSystemCmd(rm_cmd, v, v);
 
 
 

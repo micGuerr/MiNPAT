@@ -42,11 +42,10 @@ dcm2bids_cmd = [fullfile(DICOM2BIDS,'dcm2bids') ...
                 ' -o ' outpFolder ];
 
 % print the string to command line
-fprintf('===============================================\n');
-fprintf('Converting...\n');
-fprintf('Subject ID: %s\n', subID);
-fprintf('Session ID: %s\n', sesID);
-fprintf('Final command is:\n\n');
+
+fprintf('\nConverting DICOM to NIFTI...');
 
 % execte the command from the operating system
-[status, result] = runSystemCmd(dcm2bids_cmd, 1);
+tic
+[status, result] = runSystemCmd(dcm2bids_cmd, 0, 0);
+fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])

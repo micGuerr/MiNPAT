@@ -46,6 +46,8 @@ bfcData = struct();
 bfcData.t1w = fullfile(t1w_path, sprintf('%s_bfc.nii.gz', t1w_name));
 
 %% Define and run the command. This depends on whether there is or not the T2w image
+fprintf('Correcting for bias field...');
+tic
 
 % Check 
 if ~exist(bfcData.t1w, 'file')
@@ -62,7 +64,8 @@ if ~exist(bfcData.t1w, 'file')
                                ' --noReorient'];
 
         % run the bfc
-        status = runSystemCmd(bfc_cmd, 1); 
+        [status, result] = runSystemCmd(bfc_cmd, 0, 0); 
+        fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])
     else
         % define the command
         bfc_cmd = ['biasField_rm --in=' biasedData.t1w, ...
@@ -70,7 +73,8 @@ if ~exist(bfcData.t1w, 'file')
                                ' --noReorient'];
 
         % run the bfc
-        [status, result] = runSystemCmd(bfc_cmd, 1); 
+        [status, result] = runSystemCmd(bfc_cmd, 0, 0); 
+        fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])
     end
 else
     % need to return the t2w output name anyway

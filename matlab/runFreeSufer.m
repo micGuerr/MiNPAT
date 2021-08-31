@@ -62,7 +62,13 @@ if ~exist(fsOutput, 'file')
                          ' -openmp ' int2str(nCores)];
     end
     % and run the command
-    status = runSystemCmd(fs_cmd, 1);
+    fprintf('Running freesurfer recon (several hours to go)...');
+    tic
+    status = runSystemCmd(fs_cmd, 0, 0);
+    hours=floor(toc/3600);
+    minutes=floor(toc/60-hours*60);
+    seconds=toc-hours*3600-minutes*60;
+    fprintf(['    done in ',num2str(hours,'%.0f'),' hours, ',num2str(minutes,'%.0f'),' minutes and ',num2str(seconds,'%.0f'),' seconds\n'])
 else
     warning('FreeSurfer output for ID %s already exist. If you want to carry on with the analysis, consider changing name of the subject folder already  or remove it', ...
         fsID);
@@ -84,5 +90,5 @@ copyfile(orig_fsLogFile, fs_logFile);
 
 % Check process status, output an error if something didn't work
 if status
-    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+    error('Something went wrong in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end

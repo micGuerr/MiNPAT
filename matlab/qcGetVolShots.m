@@ -28,9 +28,7 @@ for ii = 1:nF
     % input the full path
     filename = fullfile(wrkDir, fList{ii});
     % Do the job ...
-    getOrthoView_VolAdHoc(filename)
+    getOrthoView_VolAdHoc(filename);
 end
-
-
 
 

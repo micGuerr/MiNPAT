@@ -9,4 +9,4 @@ function [status, result] = ln_files(inFile, targetLinkName)
 
 cmd = sprintf('ln -s %s %s', inFile, targetLinkName);
 
-[status, result] = runSystemCmd(cmd, 1);
+[status, result] = runSystemCmd(cmd, 0, 0);

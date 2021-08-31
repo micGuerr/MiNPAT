@@ -19,13 +19,13 @@ function startNewProcessing(processingFolder_path, dicomData_path)
 %   The following folders and files will be created:
 % 
 %   <processingFolder_path>
-%   ├── rawData/
-%   ├── popLevelAnalysis/
-%   ├── subLevelAnalysis/
-%   ├── logs/
-%   │   └── log_sub-XXX.txt
-%   └── config/
-%        └── pathSetup.m
+%   ????????? rawData/
+%   ????????? popLevelAnalysis/
+%   ????????? subLevelAnalysis/
+%   ????????? logs/
+%   ??????? ????????? log_sub-XXX.txt
+%   ????????? config/
+%     ???? ????????? pathSetup.m
 % 
 %   rawData/                Is the folder in which the unprocessed (raw) 
 %                           data will be stored after conversion fron DICOM
@@ -72,11 +72,11 @@ suban = fullfile(processingFolder_path, 'subLevelAnalysis');
 log = fullfile(processingFolder_path, 'logs');
 config = fullfile(processingFolder_path, 'config');
 
-mkdir(rawdat)
-mkdir(popan)
-mkdir(suban)
-mkdir(log)
-mkdir(config)
+if ~exist(rawdat, 'dir'), mkdir(rawdat); end
+if ~exist(popan, 'dir'), mkdir(popan); end
+if ~exist(suban, 'dir'), mkdir(suban); end
+if ~exist(log, 'dir'), mkdir(log); end
+if ~exist(config, 'dir'), mkdir(config); end
 
 %% Copy config file and log template into corresponding folders
 
@@ -87,10 +87,10 @@ if ~exist(pathSetup_dest, 'file')
 end
 
 %% Automatically update the pathSetup.m file
-
+fprintf('\nSearching for external softwares...\n')
 % Update Neuroplasticity Microstructure analysis toolbox folder path
 plasticity_path = erase(erase(which('dcmConvert'), ...
-                'dcmConvert.m'), 'matlab');
+                'dcmConvert.m'), '/matlab');
 update_pathSetup(pathSetup_dest, {'MINPAT'}, ... 
                     {plasticity_path} );
 
@@ -98,31 +98,60 @@ update_pathSetup(pathSetup_dest, {'MINPAT'}, ...
 update_pathSetup(pathSetup_dest, {'PROCESSDIR', 'DICOMDIR', 'RAWDIR', 'POPANDIR', 'SUBANDIR'}, ... 
                     {processingFolder_path, dicomData_path, rawdat, popan, suban} );
                 
-% Update the external softares paths if correctly configured on this system
-update_pathSetup(pathSetup_dest, {'FSLDIR', 'FREESURFER_HOME', 'DTITK'}, ... 
-                    {getenv('FSLDIR'), getenv('FREESURFER_HOME'), getenv('DTITK_ROOT')} );
+% Update the external software paths if correctly configured on this system
+if ~isempty(getenv('FSLDIR'))
+    fprintf(['  - fsl has been found in: ', getenv('FSLDIR'),'\n'])
+    update_pathSetup(pathSetup_dest, {'FSLDIR'}, {getenv('FSLDIR')});
+else
+    warning('fsl not found.\n%s','Make sure it is installed and added in Matlab path or add it manually in LongAn_Setup.m')
+end
+if ~isempty(getenv('FREESURFER_HOME'))
+    fprintf(['  - freesurfer has been found in: ', getenv('FREESURFER_HOME'),'\n'])
+    update_pathSetup(pathSetup_dest, {'FREESURFER_HOME'}, {getenv('FREESURFER_HOME')});
+else
+    warning('freesurfer not found.\n%s','Make sure it is installed and added in system path environment variable or add it manually in LongAn_Setup.m')
+end
+if ~isempty(getenv('DTITK_ROOT'))
+    fprintf(['  - DTI-TK has been found in: ', getenv('DTITK_ROOT'),'\n'])
+    update_pathSetup(pathSetup_dest, {'DTITK'}, {getenv('DTITK_ROOT')});
+else
+    warning('DTI-TK not found.\n%s','Make sure it is installed and added in system path environment variable or add it manually in LongAn_Setup.m')
+end
 
-                
 % Update Matlab toolboxes paths
 noddi_path = erase(erase(erase(which('SynthMeasWatsonSHStickTortIsoV_B0'), ...
-                'SynthMeasWatsonSHStickTortIsoV_B0.m'), 'watson'), 'models');
-update_pathSetup(pathSetup_dest, {'NODDI'}, ... 
-                    {noddi_path} );
-                
+                '/SynthMeasWatsonSHStickTortIsoV_B0.m'), '/watson'), 'models');
+if ~isempty(noddi_path)
+    fprintf(['  - NODDI has been found in: ', noddi_path,'\n'])
+    update_pathSetup(pathSetup_dest, {'NODDI'}, {noddi_path} );
+else
+    warning('NODDI not found.\n%s','Make sure it is installed and added in system path environment variable or add it manually in LongAn_Setup.m')
+end                
 % Update other software paths (dcm2niix, dcm2bids)
-[niixStatus, dcm2niix_path] = runSystemCmd('which dcm2niix', 0);
-[bidsStatus, dcm2bids_path] = runSystemCmd('which dcm2bids', 0);
+[niixStatus, dcm2niix_path] = runSystemCmd('which dcm2niix', 0, 0);
+if niixStatus==0
+    fprintf(['  - dcm2nii has been found in: ', dcm2niix_path])
+    update_pathSetup(pathSetup_dest, {'DICOM2NIIX'},{dcm2niix_path(1:end-1)});
+else
+    warning('dcm2nii not found.\n%s','Make sure it is installed and added in system path environment variable or add it manually in LongAn_Setup.m')
+end
+[bidsStatus, dcm2bids_path] = runSystemCmd('which dcm2bids', 0, 0);
+if bidsStatus==0
+    fprintf(['  - dcm2bids has been found in: ', dcm2bids_path])
+    update_pathSetup(pathSetup_dest, {'DICOM2NIIX'},{dcm2bids_path(1:end-1)});
+else
+    warning('dcm2bids not found.\n%s','Make sure it is installed and added in system path environment variable or add it manually in LongAn_Setup.m')
+end
 
-if ~isempty(dcm2niix_path) && ~niixStatus; dcm2niix_path = erase( dcm2niix_path,'dcm2niix'); end
-if ~isempty(dcm2bids_path) && ~bidsStatus; dcm2bids_path = erase( dcm2bids_path,'dcm2bids'); end
-
-update_pathSetup(pathSetup_dest, {'DICOM2NIIX', 'DICOM2BIDS'}, ...
-                    {dcm2niix_path(1:end-1), dcm2bids_path(1:end-1)} );
-
+% if ~isempty(dcm2niix_path) && ~niixStatus; dcm2niix_path = erase( dcm2niix_path,'dcm2niix'); end
+% if ~isempty(dcm2bids_path) && ~bidsStatus; dcm2bids_path = erase( dcm2bids_path,'dcm2bids'); end
+% 
+% update_pathSetup(pathSetup_dest, {'DICOM2NIIX', 'DICOM2BIDS'}, ...
+%                     {dcm2niix_path(1:end-1), dcm2bids_path(1:end-1)} );
+fprintf('\n')
 %% Add permanently the processing folder to the matlab path
 
 strtUpFile = fullfile(userpath,'startup.m');
-
 fid = fopen(strtUpFile, 'a+');
 fprintf(fid, ' addpath( genpath( ''%s'' ) );\n', processingFolder_path );
 fclose(fid);

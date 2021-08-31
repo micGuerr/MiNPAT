@@ -52,14 +52,16 @@ function l = qcRawData(wrkDir, subID, sesID, configFile, excludConf)
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
 % Performs QC of the files
+fprintf('Performing raw data QC...') 
+tic
 [l, fList] = qcCheckFileList(wrkDir, subID, sesID, configFile, excludConf);
 
 if l
     % Take volume shots
-    qcGetVolShots(wrkDir, fList)
+    qcGetVolShots(wrkDir, fList);
 end
-    
 
+fprintf(['    done in ',num2str(toc,'%.2f'),' seconds\n'])
 
 
 

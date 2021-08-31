@@ -33,6 +33,6 @@ else
         ' --' stream];
 end
 % Run the command
-[status, result] = runSystemCmd(mkdir_cmd, 1 );
+[status, result] = runSystemCmd(mkdir_cmd, 0, 0 );
 % Remove the "new-line" from the output path
 stramPath = result(1:end-1);

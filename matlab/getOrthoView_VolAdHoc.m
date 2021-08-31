@@ -35,6 +35,8 @@ function getOrthoView_VolAdHoc(filename)
 % Author:
 %   Michele Guerreri (m.guerreri@ucl.ac.uk)
 
+global FSLDIR
+
 %% Set up things
 
 % Get parts of the input
@@ -48,12 +50,26 @@ ftype = fsplits{end};
 outname = fullfile(fpath, sprintf('%s.png', fname));
 
 % check if the file exists
+
 if ~exist(outname, 'file')  
     %% Set different options for different file types
     [frac, intensity, scale] = setPicturePref(ftype, fname);
     
+    %% Extract first volume if 4D
+    info_cmd=[fullfile(FSLDIR, 'bin', 'fslinfo ') filename ' | grep dim4'];
+    [~,info]=runSystemCmd(info_cmd,0,0);
+    info=split(info);
+    dim4=info{2};
+
+    if dim4>1
+        filename0=fullfile(fpath, sprintf('%s_0.nii.gz', fname));
+        firstVol_cmd=['export FSLOUTPUTTYPE=NIFTI_GZ;' fullfile(FSLDIR, 'bin', 'fslroi ') filename, ' ', filename0, ' 0 1'];
+        runSystemCmd(firstVol_cmd, 0, 0);
+        filename=filename0;
+    end
+
     %% Do the job
-    getOrthoView(filename, frac, intensity, scale, outname)
+    getOrthoView(filename, frac, intensity, scale, outname);
 else
     warning('File %s already exist!', outname);
 end

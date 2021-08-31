@@ -35,7 +35,7 @@ function [status, fileList] = dcm2nii(dcmdir_path, dcm_subID, dcm_sesID, configF
 %% Assinge a step title
 stepTitle = 'DICOM to NIfTI conversion';
 
-%% Run Dicom 2 nii coversio
+%% Run Dicom 2 nii coversion
 
 if ischar(dcm_sesID) % if char, assumes single folder for this timepoint
 
@@ -66,7 +66,6 @@ end
 %% Get the list of converted raw data 
 fileList = getExpectedFileList(configFile, subID, sesID);
 
-
 %% log the result and check the status
 
 
@@ -75,5 +74,5 @@ logResult(stepTitle, result, logFile);
 
 % Check process status, output an error if something didn't work
 if status
-    error('Something went wrog in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
+    error('Something went wrong in step "%s".\n Please check %s file to know more.', stepTitle, logFile);
 end

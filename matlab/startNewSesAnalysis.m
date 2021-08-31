@@ -7,17 +7,17 @@ function startNewSesAnalysis(subID, sesID, dcm_subID, dcm_sesID, dcm2nii_configF
 %   startNewSesAnalysis(subID, sesID, dcm_subID, dcm_sesID, dcm2nii_configFile, dxc2nii_exclCriter, n_cores)
 % 
 % Inputs:
-% subID                 Subject ID you want to assigne to a subject.
-% sesID                 Session Id you want to assigne to a subject
+% subID                 Subject ID you want to assign to a subject.
+% sesID                 Session Id you want to assign to a subject
 % dcm_subID             Name of the folder where DICOM data of this subject
 %                       is stored (NOT the path!).
 % dcm_sesID             Name of the folder where DICOM data of this session
 %                       is stored (NOT the path!).
 % dcm2nii_configFile    Path to configuration file for dcm2bids converison.
 %                       Must be in .json format
-% dxc2nii_exclCriter    Exclusion criteris for files you don't want to
+% dxc2nii_exclCriter    Exclusion critera for files you don't want to
 %                       include.
-% n_cores               Number of corese you would like to use in parallel
+% n_cores               Number of cores you would like to use in parallel
 %                       computing. leave empty in case no parallelization 
 %                       is needed. 
 % 
@@ -26,11 +26,11 @@ function startNewSesAnalysis(subID, sesID, dcm_subID, dcm_sesID, dcm2nii_configF
 %   The following folders and files will be created:
 % 
 %   <processingFolder_path>
-%   └── logs/
-%        └── sub-<subID>
-%            ├── ses-<sesID>
-%            │   └── sub-<subID>_ses-<sesID>_log.txt
-%            └── log_subXXX.m
+%   ????????? logs/
+%     ???? ????????? sub-<subID>
+%    ?? ??     ????????? ses-<sesID>
+%     ????     ???   ????????? sub-<subID>_ses-<sesID>_log.txt
+%     ????     ????????? log_subXXX.m
 %
 % 
 %   sub-<subID>/                Is the folder in which the unprocessed (raw) 
@@ -50,6 +50,8 @@ function startNewSesAnalysis(subID, sesID, dcm_subID, dcm_sesID, dcm2nii_configF
 
 global PROCESSDIR DICOMDIR RAWDIR SUBANDIR SUBJECTS_DIR
 global MINPAT
+
+fprintf(['Initializing session ', sesID, ' of subject ', subID, '...    '])
 
 % Setup of the paths
 pathSetup();
@@ -93,7 +95,7 @@ update_pathSetup(logSub_dest, {'targ_subid', 'dcm_subid'}, ...
                     {subID, dcm_subID} );
 
 end
-%% Make temporary copy of the session level analysifile
+%% Make temporary copy of the session level analysis file
 
 logSes_source = fullfile(MINPAT, 'log_sesLevelAn.txt');
 
@@ -132,7 +134,9 @@ update_pathSetup(logSes_dest, {'logFile'}, ...
 
 % conatenate files
 cat_cmd = sprintf('cat %s >> %s', logSes_dest, logSub_dest);
-runSystemCmd(cat_cmd, 1);
+runSystemCmd(cat_cmd, 0);
+
+fprintf('done\n')
 
 % remove the file
 delete(logSes_dest);

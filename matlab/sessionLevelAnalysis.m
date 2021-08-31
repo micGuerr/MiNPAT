@@ -37,14 +37,15 @@ dcm2nii_configFile = config.dcm2nii.configFile;
 dxc2nii_exclCriter = config.dcm2nii.configFile_excl;
 n_cores = config.parall;
 
+fprintf(['\n~~~ SESSION LEVEL ANALYSIS: session ',sesID,' of subject ' subID,' ~~~\n']);
+tic
 %% STEP 0.      DICOM TO NIfTI CONVERSION
 
 % Do the conversion
 [config.dcm2nii.outc, ...
     config.dcm2nii.expFileList] = dcm2nii(DICOMDIR, dcm_subID, dcm_sesID, dcm2nii_configFile, ...
                                 RAWDIR, subID, sesID, logFile);
-
-%  run QC
+% run QC
 config.dcm2nii.qc.outc = qcRawData(RAWDIR, subID, sesID, dcm2nii_configFile, dxc2nii_exclCriter);
 
 pauseProcess('DICOM TO NIfTI CONVERSION');
@@ -179,3 +180,4 @@ pauseProcess('Brain Mask Refinement');
 
 %% Step 2.8     Diffusion to anatomical mapping
 
+fprintf(['\n\nSESSION ',sesID,' OF SUBJECT ' subID,'    DONE IN ',num2str(toc,'%.2f'),' seconds\n'])

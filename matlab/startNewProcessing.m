@@ -149,6 +149,17 @@ end
 % update_pathSetup(pathSetup_dest, {'DICOM2NIIX', 'DICOM2BIDS'}, ...
 %                     {dcm2niix_path(1:end-1), dcm2bids_path(1:end-1)} );
 fprintf('\n')
+
+%% Create the file that will contain the database of subjects
+
+if ~exist(fullfile(processingFolder_path,'subjectsDB.csv'), 'file')
+    fid = fopen(fullfile(processingFolder_path,'subjectsDB.csv'), 'w');
+    fprintf(fid, '%s\n', 'subjectFolder, subjectID');
+    fclose(fid);
+else
+    warning('An existing database of subjects is detected.');
+end
+
 %% Add permanently the processing folder to the matlab path
 
 strtUpFile = fullfile(userpath,'startup.m');

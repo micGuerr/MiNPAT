@@ -93,10 +93,10 @@ pauseProcess('FreeSurfer (FS) analysis');
 %% Step 1.4     Anatomical brain mask definition
 
 % Define a fine brain mask for anatomical data
-[config.anat.bm.outp, ...
-    config.anat.bm.outc] = define_anatBrainMask(config.anat.fs.ID, config.anat.bfc.outp, logFile);
-
-pauseProcess('Anatomical brain mask definition');
+% [config.anat.bm.outp, ...
+%     config.anat.bm.outc] = define_anatBrainMask(config.anat.fs.ID, config.anat.bfc.outp, logFile);
+% 
+% pauseProcess('Anatomical brain mask definition');
 
 %% STEP 2.      DIFFUSION ANALYSIS
 %% Step 2.0     Folder structure and inputs definition

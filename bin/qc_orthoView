@@ -83,14 +83,14 @@ for vol in $inputnames ; do
     #
     slice_cmd="slicer $vol $opts -a $outputname"
     #
-    echo $slice_cmd
-    #$slice_cmd
+    #echo $slice_cmd
+    $slice_cmd
     #
     if [ $i -gt 0 ] ; then
-         echo "convert $tmp $outputname -append $outputname"
+        convert $tmp $outputname -append $outputname
     fi
     #
-    #cp $outputname $tmp
+    cp $outputname $tmp
     ((i++))
 done
-#rm $tmp
+rm $tmp
